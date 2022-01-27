@@ -1,3 +1,10 @@
+'''
+TODO: - Match lowertext
+	  - Regex
+	  - Look at collocations
+	  - Find bigrams
+'''
+
 import kblab
 import os, json
 import numpy as np
@@ -8,7 +15,7 @@ import time
 import re
 from itertools import repeat
 
-def word_counter(package_id, word_list):
+def word_counter(package_id, patterns):
 	'''
 	Get Counter of words in newspaper from package_id.
 	'''
@@ -20,8 +27,15 @@ def word_counter(package_id, word_list):
 			return [c, year]
 
 	if 'content.json' in p:
+		c = {w:Counter() for w in patterns["word"]}
 		for part in json.load(p.get_raw('content.json')):
-			c.update([w for w in part.get('content', '').split() if w in word_list])
+			s = part.get('content', '')
+			
+			for _, w, exp in patterns.itertuples():
+				if match := re.findall(exp, s):
+					c[w].update(match)
+					if w == 'porrno':
+						print(match)
 
 	return [c, year]
 
@@ -35,22 +49,20 @@ def main():
 	'''
 	Parallellized counting of word frequencies 
 	'''
-	word_list = pd.read_csv('data/word-list.csv')["word"].tolist()
+	patterns = pd.read_csv('data/patterns.csv')
 	issues = {'label': 'DAGENS NYHETER'}
-	max_issues = None
+	max_issues = 100
 
 	years = range(1900, 2023)
-	df = pd.DataFrame(np.zeros((len(years), len(word_list)), dtype=int), index=years, columns=word_list)
 	c = Counter()
 	
 	with multiprocessing.Pool() as pool:
 		protocols = a.search(issues, max=max_issues)
-		for count, year in pool.starmap(word_counter, zip(protocols, repeat(word_list))):
-			for key, value in count.items():
-				df.loc[year,key] += value
+		for count, year in pool.starmap(word_counter, zip(protocols, repeat(patterns))):
 			c.update(count)
 
-	df.to_csv('results/word-counts.csv')
+#	for key, value in c.items():
+#		print(key, value)
 	with open('results/word-counts.json', 'w') as f:
 		json.dump(c, f, indent=4, ensure_ascii=False)
 
@@ -58,4 +70,12 @@ def main():
 if __name__ == '__main__':
 	main()
 
+## Import patterns
 
+
+
+##word_list = pd.read_csv('data/word-list.csv')["word"].tolist()
+#issues = {'label': 'DAGENS NYHETER'}
+#max_issues = 100
+#
+#years = range(1900, 2023)
