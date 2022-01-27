@@ -1,15 +1,23 @@
 {
     "abort": {
-        "abort": 13,
-        "abortmotståndare": 2,
-        "aborträtten": 1,
-        "aborter": 1
+        "abort": 18,
+        "aborter": 5,
+        "aborträtten": 3,
+        "aborten": 1,
+        "aborträtt": 1,
+        "abortfrågan": 1,
+        "väljabort": 1,
+        "abortmotståndare": 2
     },
     "aids": {
-        "aids": 6
+        "aids": 8
     },
-    "analsex": {},
-    "bisex": {},
+    "analsex": {
+        "analsexscen": 1
+    },
+    "bisex": {
+        "bisexuell": 1
+    },
     "fosterfördriv": {},
     "frigid": {},
     "gonorreé": {},
@@ -23,8 +31,9 @@
         "hive": 3
     },
     "homosex": {
-        "homosexualitet": 2,
-        "homosexuell": 1,
+        "homosexuell": 3,
+        "homosexualitet": 3,
+        "homosexuellt": 1,
         "homosexuella": 2,
         "homosexuelle": 2
     },
@@ -37,7 +46,9 @@
     "könsherpes": {},
     "könsorgan": {},
     "könssjukdom": {},
-    "masochis": {},
+    "masochis": {
+        "masochism": 2
+    },
     "masturbae": {},
     "onanie": {
         "onanerat": 1,
@@ -46,13 +57,38 @@
     "osedlig": {},
     "otukt": {},
     "ppiller": {},
-    "pervers": {},
+    "pervers": {
+        "perversion": 1,
+        "perversa": 2
+    },
     "pessar": {},
     "petting": {},
     "porrno": {
+        "Sporre": 3,
+        "skyskraporna": 5,
+        "porrtidning": 2,
+        "lamporna": 1,
+        "porr": 7,
+        "klipporna": 6,
+        "gliporna": 1,
+        "porrvärlden": 3,
+        "porrindustri": 4,
+        "porrfilmsinspelningar": 1,
+        "porrskådespelare": 1,
+        "porrens": 2,
+        "porrbranschen": 4,
+        "porrfilmsbranschen": 1,
+        "porrvärldens": 2,
+        "porrfilmsregissör": 1,
+        "pornografen": 1,
+        "porrmogulen": 1,
+        "porrindustrin": 1,
+        "porrskådespelaren": 1,
+        "porrfilmen": 1,
+        "porrstjärnan": 1,
+        "Riddarsporrens": 1,
+        "trapporna": 5,
         "mjukporriga": 2,
-        "trapporna": 4,
-        "porrindustri": 1,
         "porrfilmindustri": 1,
         "lopporna": 1,
         "Hälsporre": 1,
@@ -60,43 +96,41 @@
         "barnporrfilmer": 1,
         "barnpornografi": 1,
         "Sporrgränd": 1,
-        "skyskraporna": 3,
         "bampornografibrott": 1,
         "flickporr": 2,
         "pornografi": 1,
         "Youporn": 1,
-        "porr": 1,
         "sporre": 1,
         "Hetsporren": 1,
         "aporna": 1,
-        "Sporre": 1,
-        "gladporr": 1,
-        "klipporna": 3
+        "gladporr": 1
     },
     "preventivmed": {},
     "prostitu": {
+        "prostitution": 12,
         "prostituerade": 2,
-        "prostituerad": 1,
-        "prostitution": 9
+        "prostituerad": 1
     },
     "samlag": {},
     "sexköp": {
-        "sexköpare": 2,
+        "sexköpare": 3,
         "sexköp": 1
     },
-    "sexhand": {},
+    "sexhand": {
+        "barnsexhandel": 1
+    },
     "sexuell": {
-        "sexuell": 7,
-        "sexuella": 30,
-        "sexuellt": 6,
+        "sexuella": 54,
+        "sexuell": 12,
+        "sexuellt": 8,
         "sexuelle": 2
     },
     "sexual": {
-        "sexualitet": 3,
+        "sexualförbrytare": 3,
+        "sexualitet": 8,
         "sexualiteten": 3,
         "sexualpartner": 2,
         "sexualism": 1,
-        "sexualförbrytare": 1,
         "sexualbrott": 1,
         "sexualforskare": 1,
         "sexualvanor": 1,
@@ -109,8 +143,8 @@
     "steriliser": {},
     "syfilis": {},
     "transsex": {
-        "transsexuell": 1,
-        "transsexuella": 1
+        "transsexuella": 2,
+        "transsexuell": 1
     },
     "transvesti": {
         "transvestit": 9,
@@ -120,19 +154,26 @@
         "transvestiter": 1
     },
     "våldtaäkt": {
+        "våldtäkter": 7,
+        "våldtäkt": 19,
+        "våldtar": 2,
+        "våldtäktsman": 2,
+        "våldtagit": 5,
+        "våldtäktsförsök": 2,
+        "våldtäktsförsöket": 3,
+        "våldta": 1,
+        "våldtas": 1,
+        "våldtäktshot": 1,
+        "gruppvåldtäkt": 1,
+        "våldtäkten": 6,
+        "våldtagits": 3,
         "våldtäktsmän": 1,
-        "våldtagit": 3,
-        "våldtäkt": 14,
         "våldtäktshoten": 1,
         "våldtagen": 2,
-        "våldtäkten": 5,
-        "våldtagits": 2,
         "våldtäktskultur": 1,
         "våldtagna": 2,
-        "våldtäkter": 3,
         "våldtäkterna": 2,
         "våldtäktsmålen": 1,
-        "serievåldtäktsman": 1,
-        "våldtäktsförsöket": 1
+        "serievåldtäktsman": 1
     }
 }
