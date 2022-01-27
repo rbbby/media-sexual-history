@@ -50,7 +50,7 @@ def main():
 	'''
 	patterns = pd.read_csv('data/patterns.csv')
 	issues = {'label': 'DAGENS NYHETER'}
-	max_issues = 100
+	max_issues = None
 
 	years = range(1900, 2023)
 	c = Counter()
