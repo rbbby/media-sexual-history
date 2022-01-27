@@ -1,11 +1,14 @@
 import kblab
 import os, json
+import numpy as np
+import pandas as pd
 from collections import Counter
 import multiprocessing
 import time
 import re
+from itertools import repeat
 
-def count(package_id):
+def word_counter(package_id, word_list):
 	'''
 	Get Counter of words in newspaper from package_id.
 	'''
@@ -14,55 +17,45 @@ def count(package_id):
 	if 'meta.json' in p:
 		year = int(json.load(p.get_raw('meta.json')).get('year'))
 		if year < 1900:
-			return c
+			return [c, year]
 
 	if 'content.json' in p:
 		for part in json.load(p.get_raw('content.json')):
-			c.update(part.get('content', '').split())
+			c.update([w for w in part.get('content', '').split() if w in word_list])
 
-	return c
+	return [c, year]
 
 # Archive needs to be loaded in every subprocess
-with open(os.path.expanduser('~/credentials.txt'), 'r') as f:
-		credentials = f.read()
-a = kblab.Archive('https://betalab.kb.se', auth=('demo', credentials))
+with open(os.path.expanduser('~/keys/kb-credentials.txt'), 'r') as f:
+	credentials = f.read().strip('\n')
+a = kblab.Archive('https://datalab.kb.se', auth=('demo', credentials))
 
 # This will not run / be loaded within the subprocess
 def main():
 	'''
 	Parallellized counting of word frequencies 
 	'''
+	word_list = pd.read_csv('data/word-list.csv')["word"].tolist()
+	issues = {'label': 'DAGENS NYHETER'}
 	max_issues = None
 
-	start = time.time()
-	issues = {'label': 'DAGENS NYHETER'}
+	years = range(1900, 2023)
+	df = pd.DataFrame(np.zeros((len(years), len(word_list)), dtype=int), index=years, columns=word_list)
 	c = Counter()
+	
 	with multiprocessing.Pool() as pool:
-		for words in pool.imap(count, a.search(issues, max=max_issues)):
-		    c.update(words)
+		protocols = a.search(issues, max=max_issues)
+		for count, year in pool.starmap(word_counter, zip(protocols, repeat(word_list))):
+			for key, value in count.items():
+				df.loc[year,key] += value
+			c.update(count)
 
-	print(f'Finished after {round(time.time()-start, 2)} seconds')
-
-	with open('word-counts.json', 'w') as f:
+	df.to_csv('results/word-counts.csv')
+	with open('results/word-counts.json', 'w') as f:
 		json.dump(c, f, indent=4, ensure_ascii=False)
+
 	
-	
-#if __name__ == '__main__':
-#	main()
+if __name__ == '__main__':
+	main()
 
-with open('word-counts.json', 'r') as f:
-	c = json.load(f)
 
-## Descriptive statistics
-#print(f'No. tokens before removing rare tokens: {sum(c.values())}')
-## Perform additional cleaning before removing rare words (i.e. replace(',', '') etc.)
-#c = {key:value for key, value in c.items() if value > 5}
-#print(f'No. tokens after removing rare tokens: {sum(c.values())}')
-#print(f'Proportion of tokens with only alphabetic characters: \
-#{round(sum([word.isalpha() for word in c.keys()]) / len(c), 2)}')
-#print(f'Proportion of tokens including hyphen: \
-#{round(len([word for word in c.keys() if "-" in word]) / len(c), 2)}')
-
-# List of words containing special characters
-pattern = re.compile(r'[^A-Za-zÀ-ÿ0-9]')
-special_words = [word for word in c.keys() if bool(pattern.search(word))]
