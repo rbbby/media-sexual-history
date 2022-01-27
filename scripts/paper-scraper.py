@@ -14,6 +14,7 @@ import multiprocessing
 import time
 import re
 from itertools import repeat
+import subprocess
 
 def word_counter(package_id, patterns):
 	'''
@@ -34,8 +35,6 @@ def word_counter(package_id, patterns):
 			for _, w, exp in patterns.itertuples():
 				if match := re.findall(exp, s):
 					c[w].update(match)
-					if w == 'porrno':
-						print(match)
 
 	return [c, year]
 
@@ -61,21 +60,8 @@ def main():
 		for count, year in pool.starmap(word_counter, zip(protocols, repeat(patterns))):
 			c.update(count)
 
-#	for key, value in c.items():
-#		print(key, value)
 	with open('results/word-counts.json', 'w') as f:
 		json.dump(c, f, indent=4, ensure_ascii=False)
 
-	
 if __name__ == '__main__':
 	main()
-
-## Import patterns
-
-
-
-##word_list = pd.read_csv('data/word-list.csv')["word"].tolist()
-#issues = {'label': 'DAGENS NYHETER'}
-#max_issues = 100
-#
-#years = range(1900, 2023)
