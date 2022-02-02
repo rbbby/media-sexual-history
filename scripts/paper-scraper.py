@@ -45,19 +45,18 @@ def main():
 	a = kblab.Archive('https://datalab.kb.se', auth=('demo', credentials))
 	issues = {'label': 'DAGENS NYHETER'}
 	max_issues = None
-
+	checkpoint = 2000
 	data = []
+	
 	with multiprocessing.Pool() as pool:
 		protocols = a.search(issues, max=max_issues)
-		with tqdm(total=protocols.n) as pbar:
-			for i, d in enumerate(pool.imap(text_scraper, protocols)):
-				data.extend(d)
-				pbar.update(n=1)
-				if i % 2000 == 0 and i != 0:
-					df = pd.DataFrame(data, columns=['text', 'date', 'url'])
-					df = df.loc[~df["text"] == '']
-					df.to_csv('test.csv', index=False, sep='\t')
-					print(f'Checkpoint made at i={i}')
+		for i, d in enumerate(tqdm(pool.imap(text_scraper, protocols), total=protocols.n)):
+			data.extend(d)
+			if i % checkpoint == 0 and i != 0:
+				df = pd.DataFrame(data, columns=['text', 'date', 'url'])
+				df = df.loc[df["text"] != '']
+				df.to_csv('test.csv', index=False, sep='\t')
+				print(f'Checkpoint made at i={i}')
 
 patterns = pd.read_csv('data/patterns.csv')
 with open(os.path.expanduser('~/keys/kb-credentials.txt'), 'r') as f:
