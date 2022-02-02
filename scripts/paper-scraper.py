@@ -1,67 +1,67 @@
-'''
-TODO: - Match lowertext
-	  - Regex
-	  - Look at collocations
-	  - Find bigrams
-'''
-
 import kblab
 import os, json
 import numpy as np
 import pandas as pd
-from collections import Counter
 import multiprocessing
-import time
 import re
-from itertools import repeat
-import subprocess
+import requests
+from requests.auth import HTTPBasicAuth
+from tqdm import tqdm
 
-def word_counter(package_id, patterns):
-	'''
-	Get Counter of words in newspaper from package_id.
-	'''
-	c = Counter()
-	p = a.get(package_id)
-	if 'meta.json' in p:
-		year = int(json.load(p.get_raw('meta.json')).get('year'))
-		if year < 1900:
-			return [c, year]
+def get_json(package_id, file):
+	raw = requests.get(f"https://datalab.kb.se/{package_id}/{file}.json", auth=HTTPBasicAuth("demo", credentials))	
+	if raw.status_code != 200:
+		print(f'{file} error in {package_id}')
+		return None
+	return json.loads(raw.text)
 
-	if 'content.json' in p:
-		c = {w:Counter() for w in patterns["word"]}
-		for part in json.load(p.get_raw('content.json')):
-			s = part.get('content', '')
-			
-			for _, w, exp in patterns.itertuples():
-				if match := re.findall(exp, s):
-					c[w].update(match)
+def text_scraper(package_id):
+	meta_json = get_json(package_id, 'meta')
+	if not meta_json:
+		return ['']*3
 
-	return [c, year]
+	date = meta_json.get('created', '')
+	year = int(meta_json.get('year', ''))
+	if int(year) < 1900:
+		return ['']*3
 
-# Archive needs to be loaded in every subprocess
-with open(os.path.expanduser('~/keys/kb-credentials.txt'), 'r') as f:
-	credentials = f.read().strip('\n')
-a = kblab.Archive('https://datalab.kb.se', auth=('demo', credentials))
+	content_json = get_json(package_id, 'content')
+	if not content_json:
+		return ['']*3
+
+	data = []
+	for box in content_json:
+		s = box.get('content', '')
+		s = s.lower()
+		url = box.get('@id', '')
+		for _, w, exp in patterns.itertuples():
+			if match := re.findall(exp, s):
+				data.append([s, date, url])
+				break # only need 1 match
+	return data
 
 # This will not run / be loaded within the subprocess
 def main():
-	'''
-	Parallellized counting of word frequencies 
-	'''
-	patterns = pd.read_csv('data/patterns.csv')
+	a = kblab.Archive('https://datalab.kb.se', auth=('demo', credentials))
 	issues = {'label': 'DAGENS NYHETER'}
 	max_issues = None
 
-	years = range(1900, 2023)
-	c = Counter()
-	
+	data = []
 	with multiprocessing.Pool() as pool:
 		protocols = a.search(issues, max=max_issues)
-		for count, year in pool.starmap(word_counter, zip(protocols, repeat(patterns))):
-			c.update(count)
+		with tqdm(total=protocols.n) as pbar:
+			for i, d in enumerate(pool.imap(text_scraper, protocols)):
+				data.extend(d)
+				pbar.update(n=1)
+				if i % 2000 == 0 and i != 0:
+					df = pd.DataFrame(data, columns=['text', 'date', 'url'])
+					df = df.loc[~df["text"] == '']
+					df.to_csv('test.csv', index=False, sep='\t')
+					print(f'Checkpoint made at i={i}')
 
-	with open('results/word-counts.json', 'w') as f:
-		json.dump(c, f, indent=4, ensure_ascii=False)
+patterns = pd.read_csv('data/patterns.csv')
+with open(os.path.expanduser('~/keys/kb-credentials.txt'), 'r') as f:
+	credentials = f.read().strip('\n')
 
 if __name__ == '__main__':
 	main()
