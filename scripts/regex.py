@@ -16,7 +16,7 @@ patterns = [
 	"{}heterosex{}",
 	"hiv{}",
 	"{}homosex{}",
-	"{}hånge[l|la]{}",
+	"{}hånge(?:l|la){}",
 	"{}impotens{}",
 	"{}klamydia{}",
 	"{}kondom{}",
@@ -32,7 +32,7 @@ patterns = [
 	"{}pervers{}",
 	"{}pessar{}",
 	"{}petting{}",
-	"{}por[r|no]{}",
+	"{}por(?:r|no){}",
 	"{}preventivmed{}",
 	"{}prostitu{}",
 	"{}samlag{}",
@@ -47,7 +47,7 @@ patterns = [
 	"{}syfilis{}",
 	"{}transsex{}",
 	"{}transvesti{}",
-	"{}våldt[a|äkt]{}"
+	"{}våldt(?:a|äkt){}"
 ]
 
 fix = r'[A-Za-zÀ-ÿ-]*'
