@@ -45,15 +45,18 @@ def main():
 	a = kblab.Archive('https://datalab.kb.se', auth=('demo', credentials))
 	issues = {'label': 'DAGENS NYHETER'}
 	max_issues = None
-	checkpoint = 2000
+	checkpoint = 50
 	data = []
 	
 	with multiprocessing.Pool() as pool:
 		protocols = a.search(issues, max=max_issues)
 		for i, d in enumerate(tqdm(pool.imap(text_scraper, protocols), total=protocols.n)):
+			for j in d:
+				j.append(i)
+			
 			data.extend(d)
 			if i % checkpoint == 0 and i != 0:
-				df = pd.DataFrame(data, columns=['text', 'date', 'url'])
+				df = pd.DataFrame(data, columns=['text', 'date', 'url', 'index'])
 				df = df.loc[df["text"] != '']
 				df.to_csv('test.csv', index=False, sep='\t')
 				print(f'Checkpoint made at i={i}')
