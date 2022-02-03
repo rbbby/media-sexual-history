@@ -7,8 +7,11 @@ import re
 import requests
 from requests.auth import HTTPBasicAuth
 from tqdm import tqdm
+import time
 
 def store_json(package_id):
+	if package_id in finished:
+		return
 	filename = os.path.expanduser(f'~/newspaper-data/{package_id}_')
 	try:
 		error = 1
@@ -68,25 +71,32 @@ def text_scraper(package_id):
 
 # This will not run / be loaded within the subprocess
 def main():
+	start = time.time()
 	a = kblab.Archive('https://datalab.kb.se', auth=('demo', credentials))
 	issues = {'label': 'DAGENS NYHETER'}
 	max_issues = None
 	checkpoint = 2000
 	data = []
-	
+
 	with multiprocessing.Pool() as pool:
 		protocols = a.search(issues, max=max_issues)
-		for i, d in enumerate(tqdm(pool.imap(text_scraper, protocols), total=protocols.n)):			
-			data.extend(d)
-			if i % checkpoint == 0 and i != 0:
-				df = pd.DataFrame(data, columns=['text', 'date', 'url'])
-				df = df.loc[df["text"] != '']
-				df.to_csv('test.csv', index=False, sep='\t')
-				print(f'Checkpoint made at i={i}')
+		for i, d in enumerate(pool.imap(store_json, protocols), total=protocols.n):
+			if i % 2000 == 0:
+				print(f'Iteration {i} finished after {round(time.time()-start, 2)} seconds.')
+	#for i, d in enumerate(tqdm(pool.imap(text_scraper, protocols), total=protocols.n)):			
+		#	data.extend(d)
+		#	if i % checkpoint == 0 and i != 0:
+		#		df = pd.DataFrame(data, columns=['text', 'date', 'url'])
+		#		df = df.loc[df["text"] != '']
+		#		df.to_csv('test.csv', index=False, sep='\t')
+		#		print(f'Checkpoint made at i={i}')
 
 patterns = pd.read_csv('data/patterns.csv')
 with open(os.path.expanduser('~/keys/kb-credentials.txt'), 'r') as f:
 	credentials = f.read().strip('\n')
+
+files = os.listdir(os.path.expanduser('~/newspaper-data'))
+finished = list(set([f.split('_')[0] for f in files]))
 
 if __name__ == '__main__':
 	main()
