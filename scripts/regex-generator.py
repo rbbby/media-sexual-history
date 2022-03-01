@@ -50,7 +50,7 @@ patterns = [
 	"{}våldt(?:a|äkt){}"
 ]
 
-fix = r'[A-Za-zÀ-ÿ-]*'
+fix = r'[A-Za-zÀ-ÿ-]*' # Add more characters
 d = {re.sub(r'[^A-Za-zÀ-ÿ]', '', exp):exp.format(fix, fix) for exp in patterns}
 df = pd.DataFrame(d.items(), columns=['word', 'expression'])
 df.to_csv('data/patterns.csv', index=False)
