@@ -9,94 +9,42 @@ from requests.auth import HTTPBasicAuth
 from tqdm import tqdm
 import time
 
-def store_json(package_id):
-	if package_id in finished:
-		return
-	filename = os.path.expanduser(f'~/newspaper-data/{package_id}_')
-	try:
-		error = 1
-		meta = requests.get(f"https://datalab.kb.se/{package_id}/meta.json", auth=HTTPBasicAuth("demo", credentials))	
-		error = 2
-		with open(filename + 'meta.json', 'w') as f:
-			error = 3
-			json.dump(json.loads(meta.text), f, indent=2, ensure_ascii=False)
-			error = 4
-	except:
-		print(f'Meta failed at error {error}')
-
-	try:
-		error = 1
-		content = requests.get(f"https://datalab.kb.se/{package_id}/content.json", auth=HTTPBasicAuth("demo", credentials))	
-		error = 2
-		with open(filename + 'content.json', 'w') as f:
-			error = 3
-			json.dump(json.loads(content.text), f, indent=2, ensure_ascii=False)
-			error = 4
-	except:
-		print(f'content failed at error {error}')
-
-def get_json(package_id, file):
-	raw = requests.get(f"https://datalab.kb.se/{package_id}/{file}.json", auth=HTTPBasicAuth("demo", credentials))	
-	if raw.status_code != 200:
-		print(f'{file} error in {package_id}')
-		return None
-	return json.loads(raw.text)
-
 def text_scraper(package_id):
-	try:
-		meta_json = get_json(package_id, 'meta')
-	except:
-		return ['']*3	
-
-	date = meta_json.get('created', '')
-	year = int(meta_json.get('year', ''))
-	if int(year) < 1900:
-		return ['']*3
-
-	try:
-		content_json = get_json(package_id, 'content')
-	except:
-		return ['']*3
-
 	data = []
-	for box in content_json:
-		s = box.get('content', '')
-		s = s.lower()
-		url = box.get('@id', '')
+	with open(os.path.join(path_data, package_id+'_meta.json'), 'r') as f:
+		meta = json.load(f)
+	with open(os.path.join(path_data, package_id+'_content.json'), 'r') as f:
+		content = json.load(f)
+
+	date = meta['created']
+
+	for block in content:
+		text = block['content']
 		for _, w, exp in patterns.itertuples():
-			if match := re.findall(exp, s):
-				data.append([s, date, url])
-				break # only need 1 match
-	return data
+			if match := re.findall(exp, text):
+				url = block['@id']
+				part, page, *_ = url.split('#')[-1].split('-')
+				data.append([text, part, page, date, url, match])
+
+	df = pd.DataFrame(data, columns=['text', 'part', 'page', 'date', 'url', 'match'])
+	return df
 
 # This will not run / be loaded within the subprocess
 def main():
-	start = time.time()
-	a = kblab.Archive('https://datalab.kb.se', auth=('demo', credentials))
-	issues = {'label': 'DAGENS NYHETER'}
-	max_issues = None
-	checkpoint = 2000
+	'''
+	Parallellized counting of word frequencies 
+	'''
+	files = sorted(list(set([f.split('_')[0] for f in os.listdir(path_data)])))
 	data = []
-
 	with multiprocessing.Pool() as pool:
-		protocols = a.search(issues, max=max_issues)
-		for i, d in enumerate(pool.imap(store_json, protocols), total=protocols.n):
-			if i % 2000 == 0:
-				print(f'Iteration {i} finished after {round(time.time()-start, 2)} seconds.')
-	#for i, d in enumerate(tqdm(pool.imap(text_scraper, protocols), total=protocols.n)):			
-		#	data.extend(d)
-		#	if i % checkpoint == 0 and i != 0:
-		#		df = pd.DataFrame(data, columns=['text', 'date', 'url'])
-		#		df = df.loc[df["text"] != '']
-		#		df.to_csv('test.csv', index=False, sep='\t')
-		#		print(f'Checkpoint made at i={i}')
+		for df in tqdm(pool.imap(text_scraper, files), total=len(files)):
+			data.append(df)
+	df = pd.concat(data)
+	df.to_csv('results/dn.csv', index=False)
 
-patterns = pd.read_csv('data/patterns.csv')
-with open(os.path.expanduser('~/keys/kb-credentials.txt'), 'r') as f:
-	credentials = f.read().strip('\n')
-
-files = os.listdir(os.path.expanduser('~/newspaper-data'))
-finished = list(set([f.split('_')[0] for f in files]))
+# Globals
+patterns = pd.read_csv(f'data/patterns.csv')
+path_data = '/media/robin/data/newspaper-data'
 
 if __name__ == '__main__':
 	main()
