@@ -10,7 +10,7 @@ def sample(df, n_pages_per_period):
 	for p in periods:
 		dfp = df[df['period'] == p].reset_index(drop=True)
 		incl_prob = 1/len(dfp)
-		dfp = dfp.loc[np.random.choice(len(dfp), n_pages_per_period)]
+		dfp = dfp.loc[np.random.choice(len(dfp), n_pages_per_period, replace=False)]
 		for _, row in dfp.iterrows():
 			package_id, part, page = row[['package_id', 'part', 'page']]
 			url = f"https://datalab.kb.se/{package_id}#{part}-{page}"
@@ -23,7 +23,7 @@ def subsample(df, n_pages_per_period):
 	data = []
 	for p in periods:
 		dfp = df[df['period'] == p].reset_index(drop=True)
-		dfp = dfp.loc[np.random.choice(len(dfp), n_pages_per_period)]
+		dfp = dfp.loc[np.random.choice(len(dfp), n_pages_per_period, replace=False)]
 		data.append(dfp)
 	print(f'{len(periods)*n_pages_per_period} textblocks sampled.')
 	return pd.concat(data)
@@ -31,26 +31,28 @@ def subsample(df, n_pages_per_period):
 # Load data
 path = '/media/robin/data/dn-1900-present'
 path_data = os.path.join(path, 'jsonfiles')
-df = pd.read_csv(os.path.join(path, 'dn-meta.csv'))
-df['year'] = df['date'].apply(lambda x: int(x[:4]))
-
-# Filter 1900s
-df = df[df['year'] >= 1900]
-
-# Filter parts
-parts = [p+1 for p in list(range(5))]
-df = df[df.part.isin(parts)]
-
-# Create 5-year periods
-df['period'] = df['year'].apply(lambda x: int(str(x)[:3] + str((int(str(x)[-1]) >= 5) * 5)))
-
-# Draw sample
+#df = pd.read_csv(os.path.join(path, 'dn-meta.csv'))
+#df['year'] = df['date'].apply(lambda x: int(x[:4]))
+#
+## Filter 1900s
+#df = df[df['year'] >= 1900]
+#
+## Filter parts
+#parts = [p+1 for p in list(range(5))]
+#df = df[df.part.isin(parts)]
+#
+## Create 5-year periods
+#df['period'] = df['year'].apply(lambda x: int(str(x)[:3] + str((int(str(x)[-1]) >= 5) * 5)))
+#
+## Draw sample
 np.random.seed(123)
-df = sample(df, 20)
-df.to_csv('data/sample.csv', index=False)
+#df = sample(df, 20)
+#df.to_csv('data/sample.csv', index=False)
 
+df = pd.read_csv('data/sample.csv')
 # Also sample textblocks
-df = subsample(df, 4)
+df = subsample(df, 8)
+df = df.reset_index(drop=True)
 df['text'] = pd.Series(str)
 
 for i, row in df.iterrows():
@@ -65,10 +67,18 @@ for i, row in df.iterrows():
 		url = url.split('#')[-1]
 		url = url.split('-ARTICLE')[0]
 		cpart, cpage = url.split('-')
-		if cpart == part and cpage == page and c['@type'] == 'Text':
-			data.append([c['@id'], c['content']])
-	
-	textblock_url, text = data[random.sample(range(len(data)), 1)[0]]
-	prob = row['prob'] * 1/len(data)
-	df.loc[i, ['url', 'text', 'prob']] = textblock_url, text, prob
-df.to_csv('data/ocr-quality-sample.csv', index=False)
+		text = c['content']
+		if cpart == part and cpage == page and c['@type'] == 'Text' and len(text.split()) > 20:
+			data.append([c['@id'], text])
+
+	try:
+		textblock_url, text = data[np.random.choice(range(len(data)), 1, replace=False)[0]]
+		prob = row['prob'] * 1/len(data)
+		df.loc[i, ['url', 'text', 'prob']] = textblock_url, text, prob
+
+	except:
+		df = df.drop(i)
+
+df.to_csv('data/ocr-quality-sample-2.csv', index=False)
+df = df[[c for c in df.columns if c != 'text']]
+df.to_csv('data/ocr-quality-sample-censored-2.csv', index=False)

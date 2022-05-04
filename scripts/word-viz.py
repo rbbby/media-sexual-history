@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import os, json
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -21,29 +22,40 @@ def timeplot(df):
 		
 	return f
 
-df = pd.read_csv('results/word-counts.csv')
-df.rename(columns={df.columns[0]:'time'}, inplace=True)
-n_vars = len(df.columns)-1
+with open('results/word-counts.json', 'r') as f:
+	d = json.load(f)
 
-# Over time
-f = timeplot(df)
-plt.savefig('results/plots/word-counts.png', dpi=300, bbox_inches='tight')
-plt.close('all')
+for key, values in d.items():
+	d[key] = {k:v for k, v in values.items() if v > 5}
 
-# By decade
-periods = np.array([list(np.arange(1900+(10*i), 1900+(10*(i+1)))) for i in range(13)])
-df2 = pd.DataFrame(np.zeros((len(periods), n_vars), dtype=int), columns=df.columns[1:])
-for _, row in df.iterrows():
-	year = row["time"]
-	idx = np.where(periods == year)[0][0]
-	df2.loc[idx] += row[1:]
-df2["time"] = [str(periods[i, 0]) + 's' for i in range(len(periods))]
+with open('results/word-counts-cleaned.json', 'w') as f:
+	json.dump(d, f, indent=2, ensure_ascii=False)
 
-f = timeplot(df2)
-f.set_title(f.get_title() + ' by decade')
-for i, label in enumerate(f.get_xticklabels()):
-	if i % 2 != 0:
-	    label.set_visible(False)
+#df = pd.read_csv('results/word-counts.csv')
 
-plt.savefig('results/plots/word-counts-decade.png', dpi=300, bbox_inches='tight')
-plt.close('all')
+def test():
+	df.rename(columns={df.columns[0]:'time'}, inplace=True)
+	n_vars = len(df.columns)-1
+
+	# Over time
+	f = timeplot(df)
+	plt.savefig('results/plots/word-counts.png', dpi=300, bbox_inches='tight')
+	plt.close('all')
+
+	# By decade
+	periods = np.array([list(np.arange(1900+(10*i), 1900+(10*(i+1)))) for i in range(13)])
+	df2 = pd.DataFrame(np.zeros((len(periods), n_vars), dtype=int), columns=df.columns[1:])
+	for _, row in df.iterrows():
+		year = row["time"]
+		idx = np.where(periods == year)[0][0]
+		df2.loc[idx] += row[1:]
+	df2["time"] = [str(periods[i, 0]) + 's' for i in range(len(periods))]
+
+	f = timeplot(df2)
+	f.set_title(f.get_title() + ' by decade')
+	for i, label in enumerate(f.get_xticklabels()):
+		if i % 2 != 0:
+		    label.set_visible(False)
+
+	plt.savefig('results/plots/word-counts-decade.png', dpi=300, bbox_inches='tight')
+	plt.close('all')
