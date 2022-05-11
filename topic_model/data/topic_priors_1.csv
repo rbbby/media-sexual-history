@@ -1,4 +1,9 @@
 theme,topic,word,anti,topic_id
+sex,sex,bisexuell,FALSE,0
+sex,sex,homosexuell,FALSE,0
+sex,sex,lesbisk,FALSE,0
+sex,sex,transsexuell,FALSE,0
+sex,sex,porr,FALSE,0
 sex,sex,abort,FALSE,0
 sex,sex,aids,FALSE,0
 sex,sex,analsex,FALSE,0
@@ -15,7 +20,7 @@ sex,sex,gummivaror,FALSE,0
 sex,sex,hbt,FALSE,0
 sex,sex,heterosexualitet,FALSE,0
 sex,sex,hiv,FALSE,0
-sex,sex,homosexuealitet,FALSE,0
+sex,sex,homosexualitet,FALSE,0
 sex,sex,homosexuell_sambo,FALSE,0
 sex,sex,hpv,FALSE,0
 sex,sex,hångla,FALSE,0
@@ -37,7 +42,7 @@ sex,sex,könssjukdomar,FALSE,0
 sex,sex,libido,FALSE,0
 sex,sex,lust,FALSE,0
 sex,sex,masochism,FALSE,0
-sex,sex,mastrubera,FALSE,0
+sex,sex,masturbera,FALSE,0
 sex,sex,masturbation,FALSE,0
 sex,sex,missfall,FALSE,0
 sex,sex,njutning,FALSE,0
@@ -56,7 +61,7 @@ sex,sex,pessar,FALSE,0
 sex,sex,petting,FALSE,0
 sex,sex,potens,FALSE,0
 sex,sex,preventivmedel,FALSE,0
-sex,sex,pronografi,FALSE,0
+sex,sex,pornografi,FALSE,0
 sex,sex,prostitution,FALSE,0
 sex,sex,registrerat_partnerskap,FALSE,0
 sex,sex,runka,FALSE,0
@@ -83,8 +88,8 @@ sex,sex,sexull_identitet,FALSE,0
 sex,sex,spiral,FALSE,0
 sex,sex,sterilisering,FALSE,0
 sex,sex,syfilis,FALSE,0
-sex,sex,transexualism,FALSE,0
-sex,sex,transvetism,FALSE,0
+sex,sex,transsexualism,FALSE,0
+sex,sex,transvestism,FALSE,0
 sex,sex,vagina,FALSE,0
 sex,sex,vaginism,FALSE,0
 sex,sex,vestibulit,FALSE,0
