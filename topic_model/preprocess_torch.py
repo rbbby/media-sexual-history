@@ -45,7 +45,7 @@ class MalletDataset(IterableDataset):
 def main(args):
     # Replacement patterns
     grams= {}
-    with open('topic_model/bi-grams.txt') as file:
+    with open('topic_model/data/n_grams.txt') as file:
         for g in file:
             g = g.replace('\n', '')
             grams[g] = re.sub(r'[^a-zåäö]+', '_', g)
@@ -64,14 +64,17 @@ def main(args):
     # Use torch to process and write text in parallell and batches
     dataset = MalletDataset(args.filename, patterns)
     dataloader = DataLoader(dataset, batch_size = args.batch_size)
+    n_batches = len(dataloader)
 
-    f = open(args.filename.replace('.txt', '_clean_test.txt'), 'w')
-    for lines in tqdm(dataloader, total=len(dataloader)):
+    f = open(args.filename.replace('.txt', '_clean.txt'), 'w')
+    for i, lines in enumerate(tqdm(dataloader, total=n_batches)):
+        if i == n_batches-1:
+            lines[-1] = lines[-1].rstrip('\n')
         f.writelines(lines)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--filename", type=str, default='/media/robin/dn/dn.txt')
+    parser.add_argument("--filename", type=str)
     parser.add_argument("--batch_size", type=int, default=512)
     args = parser.parse_args()
     main(args)
