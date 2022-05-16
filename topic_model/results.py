@@ -164,6 +164,32 @@ def get_top_doc_string(run_path, cfg, n=10):
 	return s
 
 
+theta = pd.read_csv('results/theta.csv', index_col=0)
+theta.index.name = "year"
+
+theta.columns = sorted(theta.columns) # Fix broken mapping
+
+def plot_topics_co_occurence(theta, threshold=0):
+	theta = theta[theta['sex'] >= threshold]
+	theta = theta.drop('sex', axis=1)
+	theta = theta.groupby(theta.index).sum()
+	theta = theta.div(theta.sum(axis=1), axis=0)
+	theta = pd.melt(theta.reset_index(), id_vars='year')
+
+	f, ax = plt.subplots()
+	for topic in sorted(set(theta['variable'])):
+		df_plot = theta[theta['variable'] == topic]
+		ax.plot(df_plot['year'], df_plot['value'], label=topic)
+
+	ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
+	          ncol=3, fancybox=True, shadow=True)
+	return f
+
+f = plot_topics_co_occurence(theta)
+plt.show()
+plt.close()
+
+
 
 
 
