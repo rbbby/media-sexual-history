@@ -52,7 +52,7 @@ def main(args):
 
     digit_pattern = re.compile(r'\d+')
     gram_pattern = re.compile(r'(?<=[a-zåäö])-(?=[a-zåäö])')
-    character_pattern = re.compile(r'[^a-zåäö0\s\_]')
+    character_pattern = re.compile(r'[^a-zåäö0\s\_\-]')
     latin_characters = [chr(c) for c in range(223,225+1)] # 192:591 for all
     latin_characters = {c:unidecode(c) for c in latin_characters if c not in 'åäö'}
     patterns = {'digit_pattern':digit_pattern,
