@@ -1,0 +1,597 @@
+﻿theme;topic;word;topic_id
+sex;sexual orientation;bisexuell;0
+sex;sexual orientation;homosexuell;0
+sex;sexual orientation;lesbisk;0
+sex;sexual orientation;hbt;0
+sex;sexual orientation;heterosexualitet;0
+sex;sexual orientation;heterosexuell;0
+sex;sexual orientation;homosexualitet;0
+sex;sexual orientation;homosexuell_sambo;0
+sex;sexual orientation;bisexualitet;0
+sex;sexual orientation;asexualitet;0
+sex;sexual orientation;asexuell;0
+sex;sexual orientation;könsneutrala_äktenskap;0
+sex;sexual orientation;registrerat_partnerskap;0
+sex;sexual orientation;sexuellt_uttryck;0
+sex;sexual orientation;otukt;0
+sex;gender identity;sexuell_identitet;1
+sex;gender identity;intersex;1
+sex;gender identity;intersexuella;1
+sex;gender identity;intersexuellas_könstillhörighet;1
+sex;gender identity;intersexuell;1
+sex;gender identity;transsexuell;1
+sex;gender identity;transsexualitet;1
+sex;gender identity;transsexualism;1
+sex;gender identity;trans;1
+sex;gender identity;könsdysfori;1
+sex;gender identity;hbt;1
+sex;gender identity;transsexualism;1
+sex;gender identity;transvestism;1
+sex;reproductive health;abort;2
+sex;reproductive health;dagen_efter_piller;2
+sex;reproductive health;gummivaror;2
+sex;reproductive health;kondom;2
+sex;reproductive health;missfall;2
+sex;reproductive health;sterilisering;2
+sex;reproductive health;preventivmedel;2
+sex;reproductive health;p_piller;2
+sex;reproductive health;p_skum;2
+sex;reproductive health;p_spruta;2
+sex;reproductive health;p_stav;2
+sex;reproductive health;spiral;2
+sex;reproductive health;pessar;2
+sex;reproductive health;graviditet;2
+sex;std/sexual health;aids;3
+sex;std/sexual health;gonorr;3
+sex;std/sexual health;hiv;3
+sex;std/sexual health;aids;3
+sex;std/sexual health;hpv;3
+sex;std/sexual health;vestibulit;3
+sex;std/sexual health;vulvasmärta;3
+sex;std/sexual health;syfilis;3
+sex;std/sexual health;klamydia;3
+sex;std/sexual health;könssjukdomar;3
+sex;std/sexual health;frigiditet;3
+sex;sexual crimes;grooming;4
+sex;sexual crimes;sexuella_övergrepp;4
+sex;sexual crimes;sexuellt_våld;4
+sex;sexual crimes;våldtäkt;4
+sex;sexual crimes;tafsa;4
+sex;sexual crimes;sexuellt_ofredande;4
+sex;sexual crimes;sexualbrott;4
+sex;sexual crimes;koppleri;4
+sex;sexual crimes;prostitution;4
+sex;sexual crimes;sexköp;4
+sex;sexual crimes;incest;4
+sex;sexual crimes;sexhandel;4
+sex;lust;potens;5
+sex;lust;porr;5
+sex;lust;bdsm;5
+sex;lust;impotens;5
+sex;lust;samlag;5
+sex;lust;sexting;5
+sex;lust;viagra;5
+sex;lust;klittra;5
+sex;lust;sexorgie;5
+sex;lust;lust;5
+sex;lust;njutning;5
+sex;lust;samlagsställning;5
+sex;lust;onani;5
+sex;lust;njuta;5
+sex;lust;orgie;5
+sex;lust;orgasm;5
+sex;lust;masturbera;5
+sex;lust;masturbation;5
+sex;lust;hångla;5
+sex;lust;analsex;5
+sex;lust;runka;5
+sex;lust;samlag;5
+sex;lust;petting;5
+sex;lust;pornografi;5
+sex;lust;libido;5
+sex;lust;kemsex;5
+sex;lust;könsdrift;5
+sex;lust;masochism;5
+sex;other sex;vagina;6
+sex;other sex;vaginism;6
+sex;other sex;sexual_och_samlevnadsundervisning;6
+sex;other sex;sexualisk;6
+sex;other sex;sexualitet;6
+sex;other sex;sexualkunskap;6
+sex;other sex;sexualmoral;6
+sex;other sex;sexualupplysning;6
+sex;other sex;sexolog;6
+sex;other sex;sexologi;6
+sex;other sex;sex;6
+sex;other sex;sex_och_samlevnad;6
+sex;other sex;penis;6
+sex;other sex;könsorgan;6
+sex;other sex;kön;6
+sex;other sex;pervers;6
+sex;other sex;perversion;6
+jurisprudence;crime;antasta;7
+jurisprudence;crime;beroendeställning;7
+jurisprudence;crime;bevistalan;7
+jurisprudence;crime;bilstöld;7
+jurisprudence;crime;bostadsinbrott;7
+jurisprudence;crime;brottslighet;7
+jurisprudence;crime;brottsligheten;7
+jurisprudence;crime;brottsligt;7
+jurisprudence;crime;cykelstöld;7
+jurisprudence;crime;dagsböter;7
+jurisprudence;crime;diskriminering;7
+jurisprudence;crime;fotboja;7
+jurisprudence;crime;företagsbot;7
+jurisprudence;crime;grooming;7
+jurisprudence;crime;incest;7
+jurisprudence;crime;justitieminister;7
+jurisprudence;crime;kriminalitet;7
+jurisprudence;crime;kriminaliteten;7
+jurisprudence;crime;kriminalpolitik;7
+jurisprudence;crime;kriminell;7
+jurisprudence;crime;livstidsstraff;7
+jurisprudence;crime;misshandel;7
+jurisprudence;crime;narkotikabrott;7
+jurisprudence;crime;narkotikasmuggling;7
+jurisprudence;crime;ofredande;7
+jurisprudence;crime;otukt;7
+jurisprudence;crime;personrån;7
+jurisprudence;crime;polischefen;7
+jurisprudence;crime;polismyndigheten;7
+jurisprudence;crime;prostitution;7
+jurisprudence;crime;rikspolisstyrelsen;7
+jurisprudence;crime;rättspsykiatrisk;7
+jurisprudence;crime;samhällstjänst;7
+jurisprudence;crime;sexualbrott;7
+jurisprudence;crime;sexuellt_våld;7
+jurisprudence;crime;skadestånd;7
+jurisprudence;crime;skyddstillsyn;7
+jurisprudence;crime;säkerhetspolisen;7
+jurisprudence;crime;tafsa;7
+jurisprudence;crime;tidelag;7
+jurisprudence;crime;trakasserier;7
+jurisprudence;crime;ungdomstjänst;7
+jurisprudence;crime;ungdomsvård;7
+jurisprudence;crime;villkorlig_dom;7
+jurisprudence;crime;villkorlig_frigivning;7
+jurisprudence;crime;våldtäkt;7
+jurisprudence;crime;övergrepp;7
+jurisprudence;decriminalization;avkriminalisering;8
+jurisprudence;decriminalization;legalisering;8
+jurisprudence;decriminalization;prostitution;8
+jurisprudence;social_human_rights;amnesty_international;9
+jurisprudence;social_human_rights;antidiskriminering;9
+jurisprudence;social_human_rights;barnkonventionen;9
+jurisprudence;social_human_rights;diskrimineringslag;9
+jurisprudence;social_human_rights;diskrimineringslagen;9
+jurisprudence;social_human_rights;diskrimineringslagstiftningen;9
+jurisprudence;social_human_rights;diskrimineringsombudsman;9
+jurisprudence;social_human_rights;diskrimineringsombudsmannen;9
+jurisprudence;social_human_rights;diskrimineringsutredningen;9
+jurisprudence;social_human_rights;europakonventionen;9
+jurisprudence;social_human_rights;fnkonvention;9
+jurisprudence;social_human_rights;fnkonventioner;9
+jurisprudence;social_human_rights;handikappombudsmannen;9
+jurisprudence;social_human_rights;handikappråd;9
+jurisprudence;social_human_rights;hatbrott;9
+jurisprudence;social_human_rights;hbtq_rättigheter;9
+jurisprudence;social_human_rights;hets_mot_folkgrupp;9
+jurisprudence;social_human_rights;homosexuella_sambor;9
+jurisprudence;social_human_rights;human_rights;9
+jurisprudence;social_human_rights;humanitära_skäl;9
+jurisprudence;social_human_rights;jämställdhetsminister;9
+jurisprudence;social_human_rights;jämställdhetsministern;9
+jurisprudence;social_human_rights;jämställdhetsombudsmannen;9
+jurisprudence;social_human_rights;könsdiskriminerande_reklam;9
+jurisprudence;social_human_rights;könsdiskriminering;9
+jurisprudence;social_human_rights;könsdiskrimineringen;9
+jurisprudence;social_human_rights;könsneutrala_äktenskap;9
+jurisprudence;social_human_rights;medborgarrättigheter;9
+jurisprudence;social_human_rights;minoritetsrättigheter;9
+jurisprudence;social_human_rights;människorättsorganisation;9
+jurisprudence;social_human_rights;mänskliga_rättigheter;9
+jurisprudence;social_human_rights;mänskligheten;9
+jurisprudence;social_human_rights;rasdiskriminerande;9
+jurisprudence;social_human_rights;rasdiskriminering;9
+jurisprudence;social_human_rights;rasdiskrimineringens;9
+jurisprudence;social_human_rights;registrerat_partnerskap;9
+jurisprudence;social_human_rights;rättighet;9
+jurisprudence;social_human_rights;rättigheter;9
+jurisprudence;social_human_rights;röda_korset;9
+jurisprudence;social_human_rights;steriliseringskrav;9
+jurisprudence;social_human_rights;tortyr;9
+jurisprudence;social_human_rights;unicef;9
+jurisprudence;social_human_rights;åldersdiskriminering;9
+jurisprudence;social_human_rights;åldersdiskrimineringen;9
+health;disease;astma;10
+health;disease;diabetes;10
+health;disease;dement;10
+health;disease;kronisk;10
+health;disease;demens;10
+health;disease;aids;10
+health;disease;cancer;10
+health;disease;depression;10
+health;disease;diagnos;10
+health;disease;gonorr;10
+health;disease;hiv;10
+health;disease;hjärtattack;10
+health;disease;stroke;10
+health;disease;hjärtinfarkt;10
+health;disease;hpv;10
+health;disease;klamydia;10
+health;disease;könsdysfori;10
+health;disease;könssjukdomar;10
+health;disease;sjuk;10
+health;disease;sjukdom;10
+health;disease;sjukskriven;10
+health;disease;syfilis;10
+health;healthcare;hälsovårdsministern;11
+health;healthcare;kondom;11
+health;healthcare;landstingen;11
+health;healthcare;medicinalstyrelsen;11
+health;healthcare;p_piller;11
+health;healthcare;p_spruta;11
+health;healthcare;p_stav;11
+health;healthcare;pessar;11
+health;healthcare;preventivmedel;11
+health;healthcare;regioner;11
+health;healthcare;sjukförsäkringslagen;11
+health;healthcare;sjukhus;11
+health;healthcare;sjukvårdsfrågorna;11
+health;healthcare;sjukvårdsminister;11
+health;healthcare;sjukvårdspolitik;11
+health;healthcare;sjukvårdspolitiken;11
+health;healthcare;sjukvårdspolitisk;11
+health;healthcare;sjukvårdspolitiska;11
+health;healthcare;socialförsäkringsminister;11
+health;healthcare;socialminister;11
+health;healthcare;socialministern;11
+health;healthcare;socialstyrelsen;11
+health;healthcare;spiral;11
+health;healthcare;sterilisering;11
+health;healthcare;vård_och_omsorg;11
+health;healthcare;vårdpolitiken;11
+health;healthcare;äldreomsorg;11
+health;healthcare;äldreomsorgen;11
+health;healthcare;äldreomsorgsminister;11
+health;healthcare;äldrepolitik;11
+morality;religion;bibeln;12
+morality;religion;böneutrop;12
+morality;religion;familj;12
+morality;religion;helgmålsringning;12
+morality;religion;imam;12
+morality;religion;islam;12
+morality;religion;islamisk;12
+morality;religion;koranen;12
+morality;religion;kristendom;12
+morality;religion;kristna;12
+morality;religion;kyrkoherde;12
+morality;religion;kärnfamilj;12
+morality;religion;moske;12
+morality;religion;muslimska;12
+morality;religion;profeten_mohammed;12
+morality;religion;promiskuitet;12
+morality;religion;präster;12
+morality;religion;rabbin;12
+morality;religion;ramadan;12
+morality;religion;sodomi;12
+morality;religion;påve;12
+morality;religion;påven;12
+morality;religion;sveriges_muslimska_råd;12
+morality;religion;synagoga;12
+morality;moral;anständig;13
+morality;moral;berömvärd;13
+morality;moral;etik;13
+morality;moral;heligt;13
+morality;moral;moral;13
+morality;moral;oanständig;13
+morality;moral;oheligt;13
+morality;moral;omoralisk;13
+morality;moral;oskuldsfull;13
+morality;moral;principer;13
+morality;moral;synd;13
+morality;moral;ärlig;13
+education;education;daghem;14
+education;education;elever;14
+education;education;förskolepolitik;14
+education;education;förskoleverksamhet;14
+education;education;kunnig;14
+education;education;kunskap;14
+education;education;lärare;14
+education;education;lärdom;14
+education;education;lärdomar;14
+education;education;okunnig;14
+education;education;rektor;14
+education;education;sex_och_samlevnad;14
+education;education;sexual_och_samlevnadsundervisning;14
+education;education;sexualkunskap;14
+education;education;skola;14
+education;education;skolfrågor;14
+education;education;skollagen;14
+education;education;skollagens;14
+education;education;skolminister;14
+education;education;skolministerns;14
+education;education;skolmyndighet;14
+education;education;skolpolitiken;14
+education;education;skolpolitisk;14
+education;education;skolverket;14
+education;education;skolöverstyrelse;14
+education;education;studenter;14
+education;education;undervisning;14
+education;education;utbildas;14
+education;education;utbildning;14
+education;education;utbildningsminister;14
+education;education;utbildningsministern;14
+relationship;relationship;flickvän;15
+relationship;relationship;förhållanden;15
+relationship;relationship;pojkvän;15
+relationship;relationship;sambo;15
+relationship;relationship;samboende;15
+relationship;relationship;samlevnad;15
+relationship;relationship;registrerat_partnerskap;15
+relationship;relationship;förlova;15
+relationship;relationship;förlovning;15
+relationship;relationship;änka;15
+relationship;relationship;gifta_sig;15
+relationship;relationship;partner;15
+relationship;relationship;änkling;15
+relationship;relationship;skilja;15
+relationship;relationship;skilsmässa;15
+relationship;relationship;äktenskap;15
+relationship;family;barnbarn;16
+relationship;family;barnfamilj;16
+relationship;family;barnfamiljerna;16
+relationship;family;bror;16
+relationship;family;ensamstående;16
+relationship;family;ensamstående_mammor;16
+relationship;family;ensamstående_mödrar;16
+relationship;family;ensamstående_pappor;16
+relationship;family;farföräldrar;16
+relationship;family;farmor;16
+relationship;family;förälder;16
+relationship;family;föräldrar;16
+relationship;family;gifta;16
+relationship;family;hustru;16
+relationship;family;lillasyster;16
+relationship;family;lillebror;16
+relationship;family;maka;16
+relationship;family;make;16
+relationship;family;mamma;16
+relationship;family;morfar;16
+relationship;family;morföräldrar;16
+relationship;family;mormor;16
+relationship;family;pappa;16
+relationship;family;storasyster;16
+relationship;family;storebror;16
+relationship;family;syskon;16
+relationship;family;syster;16
+other;countries;palestina;17
+other;countries;Albanien;17
+other;countries;Algeriet;17
+other;countries;Andorra;17
+other;countries;Angola;17
+other;countries;Antigua_och_Barbuda;17
+other;countries;Argentina;17
+other;countries;Armenien;17
+other;countries;Australien;17
+other;countries;Azerbajdzjan;17
+other;countries;Bahamas;17
+other;countries;Bahrain;17
+other;countries;Bangladesh;17
+other;countries;Barbados;17
+other;countries;Belarus;17
+other;countries;Belgien;17
+other;countries;Belize;17
+other;countries;Benin;17
+other;countries;Bhutan;17
+other;countries;Bolivia;17
+other;countries;Bosnien och Hercegovina;17
+other;countries;Botswana;17
+other;countries;Brasilien;17
+other;countries;Brunei;17
+other;countries;Bulgarien;17
+other;countries;Burkina_Faso;17
+other;countries;Burundi;17
+other;countries;Centralafrikanska_republiken;17
+other;countries;Chile;17
+other;countries;Colombia;17
+other;countries;Costa_Rica;17
+other;countries;Cypern;17
+other;countries;Danmark;17
+other;countries;Djibouti;17
+other;countries;Dominica;17
+other;countries;Dominikanska_republiken;17
+other;countries;Ecuador;17
+other;countries;Egypten;17
+other;countries;Ekvatorialguinea;17
+other;countries;Elfenbenskusten;17
+other;countries;El_Salvador;17
+other;countries;Eritrea;17
+other;countries;Estland;17
+other;countries;Etiopien;17
+other;countries;Fiji;17
+other;countries;Filippinerna;17
+other;countries;Finland;17
+other;countries;Frankrike;17
+other;countries;Förenade_Arabemiraten;17
+other;countries;Gabon;17
+other;countries;Gambia;17
+other;countries;Georgien;17
+other;countries;Ghana;17
+other;countries;Grekland;17
+other;countries;Grenada;17
+other;countries;Guatemala;17
+other;countries;Guinea;17
+other;countries;Guinea-Bissau;17
+other;countries;Guyana;17
+other;countries;Haiti;17
+other;countries;Honduras;17
+other;countries;Indien;17
+other;countries;Indonesien;17
+other;countries;Irak;17
+other;countries;Iran;17
+other;countries;Irland;17
+other;countries;Island;17
+other;countries;Israel;17
+other;countries;Italien;17
+other;countries;Jamaica;17
+other;countries;Japan;17
+other;countries;Jemen;17
+other;countries;Jordanien;17
+other;countries;Kambodja;17
+other;countries;Kamerun;17
+other;countries;Kanada;17
+other;countries;Kap_Verde;17
+other;countries;Kazakstan;17
+other;countries;Kenya;17
+other;countries;Kina;17
+other;countries;Kirgizistan;17
+other;countries;Kiribati;17
+other;countries;Komorerna;17
+other;countries;Kongo-Brazzaville;17
+other;countries;Kongo-Kinshasa;17
+other;countries;Kroatien;17
+other;countries;Kuba;17
+other;countries;kosovo;17
+other;countries;Kuwait;17
+other;countries;Laos;17
+other;countries;Lesotho;17
+other;countries;Lettland;17
+other;countries;Libanon;17
+other;countries;Liberia;17
+other;countries;Libyen;17
+other;countries;Liechtenstein;17
+other;countries;Litauen;17
+other;countries;Luxemburg;17
+other;countries;Madagaskar;17
+other;countries;Malawi;17
+other;countries;Malaysia;17
+other;countries;Maldiverna;17
+other;countries;Mali;17
+other;countries;Malta;17
+other;countries;Marocko;17
+other;countries;Marshallöarna;17
+other;countries;Mauretanien;17
+other;countries;Mauritius;17
+other;countries;Mexiko;17
+other;countries;Mikronesiska_federationen;17
+other;countries;Moçambique;17
+other;countries;Moldavien;17
+other;countries;Monaco;17
+other;countries;Montenegro;17
+other;countries;Mongoliet;17
+other;countries;Myanmar;17
+other;countries;Namibia;17
+other;countries;Nauru;17
+other;countries;Nederländerna;17
+other;countries;Nepal;17
+other;countries;Nicaragua;17
+other;countries;Niger;17
+other;countries;Nigeria;17
+other;countries;Nordkorea;17
+other;countries;Nordmakedonien;17
+other;countries;Norge;17
+other;countries;Nya_Zeeland;17
+other;countries;Oman;17
+other;countries;Pakistan;17
+other;countries;Palau;17
+other;countries;Panama;17
+other;countries;Papua_Nya_Guinea;17
+other;countries;Paraguay;17
+other;countries;Peru;17
+other;countries;Polen;17
+other;countries;Portugal;17
+other;countries;Qatar;17
+other;countries;Rumänien;17
+other;countries;Rwanda;17
+other;countries;Ryssland;17
+other;countries;Saint_Kitts_och_Nevis;17
+other;countries;Saint_Lucia;17
+other;countries;Saint_Vincent_och_Grenadinerna;17
+other;countries;Salomonöarna;17
+other;countries;Samoa;17
+other;countries;San_Marino;17
+other;countries;São_Tomé_och_Príncipe;17
+other;countries;Saudiarabien;17
+other;countries;Schweiz;17
+other;countries;Senegal;17
+other;countries;Seychellerna;17
+other;countries;Serbien;17
+other;countries;Sierra_Leone;17
+other;countries;Singapore;17
+other;countries;Slovakien;17
+other;countries;Slovenien;17
+other;countries;Somalia;17
+other;countries;Spanien;17
+other;countries;Sri_Lanka;17
+other;countries;Storbritannien;17
+other;countries;Sudan;17
+other;countries;Surinam;17
+other;countries;Sverige;17
+other;countries;Swaziland;17
+other;countries;Sydafrika;17
+other;countries;Sydkorea;17
+other;countries;Sydsudan;17
+other;countries;Syrien;17
+other;countries;Tadzjikistan;17
+other;countries;Tanzania;17
+other;countries;Tchad;17
+other;countries;Thailand;17
+other;countries;Tjeckien;17
+other;countries;Togo;17
+other;countries;Tonga;17
+other;countries;Trinidad_och_Tobago;17
+other;countries;Tunisien;17
+other;countries;Turkiet;17
+other;countries;Turkmenistan;17
+other;countries;Tuvalu;17
+other;countries;Tyskland;17
+other;countries;Uganda;17
+other;countries;Ukraina;17
+other;countries;Ungern;17
+other;countries;Uruguay;17
+other;countries;USA;17
+other;countries;Uzbekistan;17
+other;countries;Vanuatu;17
+other;countries;Vatikanstaten;17
+other;countries;Venezuela;17
+other;countries;Vietnam;17
+other;countries;Zambia;17
+other;countries;Zimbabwe;17
+other;countries;Österrike;17
+other;countries;Östtimor;17
+other;conflicts;hamas;18
+other;conflicts;gaza;18
+other;conflicts;israel;18
+other;conflicts;palestinska;18
+other;conflicts;israeliska;18
+other;conflicts;kosovo;18
+other;conflicts;serbien;18
+other;conflicts;Centralafrikanska_republiken;18
+other;conflicts;sudan;18
+other;conflicts;sydsudan;18
+other;conflicts;israels;18
+other;international_politics;polen;19
+other;international_politics;pis;19
+other;international_politics;ungern;19
+other;international_politics;viktor_orban;19
+other;international_politics;ungerska;19
+other;international_politics;polska;19
+other;international_politics;polens;19
+other;international_politics;ungerns;19
+other;drugs;narkotika;20
+other;drugs;droger;20
+other;drugs;cannabis;20
+other;drugs;missbrukare;20
+other;drugs;tullen;20
+other;drugs;amfetamin;20
+other;drugs;LVM;20
+other;drugs;lagen_om_vård_av_missbrukare;20
+other;drugs;kokain;20
+other;drugs;marijuana;20
+other;drugs;THC;20
+other;drugs;ecstasy;20
+other;drugs;mdma;20
+other;drugs;knark;20
+other;drugs;lsd;20
+other;drugs;hasch ;20
