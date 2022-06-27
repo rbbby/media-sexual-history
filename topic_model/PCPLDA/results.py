@@ -1,47 +1,52 @@
 import numpy as np
 import pandas as pd
+import datatable as dt
 import matplotlib.pyplot as plt
 import os
 import re
 from nltk.stem import SnowballStemmer
 from pathlib import Path
 import torch
-from torch.utils.data import IterableDataset, DataLoader
+from torch.utils.data import IterableDataset
 from plotnine import ggplot, aes, geom_line, geom_abline, ggtitle, scale_x_discrete, scale_y_discrete, theme
 from functools import partial
 import multiprocessing
+from tqdm import tqdm
 
 class PosteriorDataset(IterableDataset):
 	'''
-	NOT SURE IF NEEDED?
 	Pytorch iterable dataset for postprocessing Mallet results.
 	Iterates over z_files and processed corpus jointly in parallel.
 	'''
 	def __init__(self, root, cfg):
-		p = Path(os.path.join(root, 'default'))
-		z_files = list(p.glob('z_[0-9]*.csv'))
-		burn_in = int(cfg.get('phi_mean_burnin', '0'))
+		p = Path(root)
+		
+		# Topic indicator filepaths after burn_in period
+		# NOTE: only uses last draw atm
+		z_files = list(p.glob('default/z_[0-9]*.csv'))
+		iterations = int(cfg.get('iterations'))
+		percent_burn_in = int(cfg.get('phi_mean_burnin', 0)) / 100
+		burn_in = iterations * percent_burn_in
 		pattern = r'(?:z_)([0-9]+)(?:.csv)'
 		z_files = [f for f in z_files if burn_in <= int(re.search(pattern, str(f)).group(1))]
-		self.topics = z_files
-		self.corpus = p / 'corpus.txt'
+		self.topics = z_files[:2] # TESTING
 
-	def preprocess(self, row):
-		text = row
-		text = text.replace('\n', '')
-		text = text.split(',')
-		text = list(map(int, text))
-		return text
+	def process_line(self, row):
+		topics = row
+		topics = topics.replace('\n', '')
+		topics = topics.split(',')
+		topics = list(map(int, topics))
+		return topics
 
-	def line_mapper(self, text, topics):
-		text 	= self.preprocess(text)
-		topics 	= list(map(self.preprocess, topics))
-		return text, topics
+	def line_mapper(self, topic):
+		topics = list(map(self.process_line, topic))
+		return topics
 
 	def __iter__(self):
-		corpus_itr = open(self.corpus)
-		topic_itr = [open(f) for f in self.topics]
-		mapped_itr = map(self.line_mapper, corpus_itr, topic_itr)
+		topic_itr = (open(f) for f in self.topics)
+		mapped_itr = map(self.line_mapper, topic_itr)
+		for i in mapped_itr:
+			print(i)
 		return mapped_itr
 
 
@@ -79,26 +84,20 @@ def get_vocab(root):
 	return vocab
 
 
-def get_phi(root, cfg, index=False, usecols=None):
-	K = int(cfg.get('topics'))
-	phi = ('0.'+pd.read_csv(os.path.join(root, 'phi-means.csv'),
-				usecols=np.arange(1, K*2, 2) if not usecols else [c*2+1 for c in usecols],
-				header=None, dtype=str)).astype(float)
+def get_phi(root):
+	phi = dt.fread(os.path.join(root, 'phi-means.csv'))
+	phi = phi.to_pandas()
 	vocab = get_vocab(root)
-	if not index:
-		phi.index = vocab
-	phi.columns = list(range(K)) if not usecols else usecols
+	phi.columns = vocab
 	return phi
 
 
 def get_seed_words(root, cfg):
-	p = Path(root).parent.parent.parent
-	q = p / cfg.get('topic_prior_filename')
 	d = {}
-	with q.open() as f:
+	with open(cfg.get('topic_prior_filename'), 'r') as f:
 		for line in f:
-			if not re.search(r'^[0-9], ', line):
-				continue
+#			if not re.search(r'^[0-9], ', line):
+#				continue
 			z, *seed_words = line.rstrip('\n').split(', ')
 			#d.update({word:int(z) for word in seed_words})
 			d.update({z:seed_words})
@@ -119,20 +118,19 @@ def plot_convergence(root):
 	return p
 
 
-def table_words(root, cfg, n=10, top_words=True):
-	# Top words does not require all topic columns
+def table_words(root, cfg, n=20, top_words=True):
 	seed_words = get_seed_words(root, cfg)
 	seed_topics = list(map(int, seed_words.keys()))
-	usecols = seed_topics if top_words else None
-	phi = get_phi(root, cfg, index=False, usecols=usecols)
-	
-	# Normalize over columns for relevant words
-	if not top_words:
-		phi = phi.div(phi.sum(axis=1), axis=0)
-		phi = phi.iloc[:,seed_topics]
 
-	data = [list(phi[col].nlargest(n).index) for col in phi.columns]
-	return pd.DataFrame({col:dat for col, dat in zip(phi.columns, data)})
+	phi = get_phi(root)
+	if not top_words:
+		phi = phi.div(phi.sum(axis=0), axis=1)
+	phi = phi.loc[seed_topics]
+
+	d = {}
+	for i, row in phi.iterrows():
+		d[i] = list(row.nlargest(n).index)
+	return pd.DataFrame(d)
 
 
 def no_co_location_line(line, target_topic_indices):
@@ -145,32 +143,32 @@ def no_co_location_line(line, target_topic_indices):
 			return text
 
 
-def learnt_words(root, cfg, target_topic, n=10):
+def learnt_words(root, cfg, target_topic, n=50):
 	'''
 	Top n words with:
 		1. highest prob to occur in target topic
 		2. no cooccurences with target topic seeded words.
 
 	'''
-	# Get word indices in target topic
 	seed_words = get_seed_words(root, cfg)
 	vocab = get_vocab(root)
 	target_topic_words = seed_words.get(f'{target_topic}')	
 	target_topic_indices = [value for key, value in vocab.items() if key in target_topic_words]
 
-	phi = get_phi(root, cfg, index=True)
-	phi = phi.drop(target_topic_indices)
+	phi = get_phi(root)
+	phi = phi.loc[target_topic]
+	phi = phi.drop(target_topic_words, errors='ignore')
 
 	process_func = partial(no_co_location_line, target_topic_indices=target_topic_indices)
 
 	with multiprocessing.Pool() as pool:
 		with open(os.path.join(root, 'default/corpus.txt'), 'r') as f:
-			for idx in pool.imap(process_func, f):
+			for idx in tqdm(pool.imap(process_func, f), total=int(cfg['M'])):
 				if idx:
 					phi = phi.drop(idx, errors='ignore')
-	phi.index = [key for key, value in vocab.items() if value in phi.index]
-	phi = phi[target_topic].sort_values(ascending=False)[:n]
-	phi = pd.DataFrame({'Word':phi.index, 'Probability':phi})
+
+	phi = phi.sort_values(ascending=False)[:n]
+	phi = pd.DataFrame({'word':phi.index, 'probability':phi}).reset_index(drop=True)
 	return phi
 
 
