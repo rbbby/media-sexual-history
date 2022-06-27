@@ -5,9 +5,12 @@ import re
 from unidecode import unidecode
 import argparse
 
-def multiple_replace(dict: dict, text: str):
-    regex = re.compile("(%s)" % "|".join(map(re.escape, dict.keys())))
-    return regex.sub(lambda mo: dict[mo.string[mo.start():mo.end()]], text) 
+
+def multiple_replace(text, i_start=192, i_end=383):
+    d = [chr(c) for c in range(i_start, i_end + 1)]
+    d = {c: unidecode(c) for c in d if c not in "åäöÅÄÖ"}
+    regex = re.compile("(%s)" % "|".join(map(re.escape, d.keys())))
+    return regex.sub(lambda mo: d[mo.string[mo.start() : mo.end()]], text)
 
 
 class MalletDataset(IterableDataset):
@@ -22,7 +25,7 @@ class MalletDataset(IterableDataset):
     def preprocess(self, line):
         patterns = self.patterns
         line = line.lower()
-        line = multiple_replace(patterns['latin_characters'], line)
+        line = multiple_replace(line)
         line = re.sub(patterns['digit_pattern'], '0', line)
         line = re.sub(patterns['character_pattern'], '', line)
         line = line.replace('-', '_')
@@ -43,22 +46,23 @@ class MalletDataset(IterableDataset):
 
 
 def main(args):
-    # Replacement patterns
-    grams= {}
-    with open('topic_model/data/n_grams.txt') as file:
-        for g in file:
-            g = g.replace('\n', '')
-            grams[g] = re.sub(r'[^a-zåäö]+', '_', g)
-
     digit_pattern = re.compile(r'\d+')
     gram_pattern = re.compile(r'(?<=[a-zåäö])-(?=[a-zåäö])')
     character_pattern = re.compile(r'[^a-zåäö0\s\_\-]')
-    latin_characters = [chr(c) for c in range(223,225+1)] # 192:591 for all
-    latin_characters = {c:unidecode(c) for c in latin_characters if c not in 'åäö'}
+
+    # N-grams
+    grams= {}
+    with open('topic_model/data/n_grams.txt') as file:
+        for line in file:
+            line = line.replace('\n', '')
+            line = line.lower()
+            line = multiple_replace(line)
+            line = re.sub(r'[^a-zåäö]+', '_', line)
+            grams[line] = line
+
     patterns = {'digit_pattern':digit_pattern,
                 'gram_pattern':gram_pattern,
                 'character_pattern':character_pattern,
-                'latin_characters':latin_characters,
                 'grams':grams}
 
     # Use torch to process and write text in parallell and batches
