@@ -27,24 +27,30 @@ def main(args):
 	# Produce results
 	cfg = get_config(args.root)
 
-	alpha = float(cfg.get('alpha'))
+	def get_dates():
+		data = []
+		with open(cfg.get('dataset'), 'r') as f:
+			for line in tqdm(f, total=int(cfg.get('iterations'))):
+				date = line.split('\t')[1]
+				year, month, day = date.split('-')
+				data.append([year, month, day])
+		return pd.DataFrame(data, columns=['year', 'month', 'day'])
 
+	def theta_wip():
+		alpha = float(cfg.get('alpha'))
+		chunksize = 10000
+		n_chunks = sum(1 for row in open('/media/robin/dn/PCPLDA/Nd.csv', 'r'))
+		print(n_chunks)
 
-	chunksize = 10000
-	n_chunks = sum(1 for row in open('/media/robin/dn/PCPLDA/Nd.csv', 'r'))
-	print(n_chunks)
+		chunks = []
+		with pd.read_csv('/media/robin/dn/PCPLDA/Nd.csv', chunksize=chunksize, dtype=float) as reader:
+			for chunk in tqdm(reader, total=n_chunks):
+				chunk += alpha
+				chunks.append(chunk.div(chunk.sum(axis=1), axis=0))
 
-	chunks = []
-	with pd.read_csv('/media/robin/dn/PCPLDA/Nd.csv', chunksize=chunksize, dtype=float) as reader:
-		for chunk in tqdm(reader, total=n_chunks):
-			chunk += alpha
-			chunks.append(chunk.div(chunk.sum(axis=1), axis=0))
+		theta = pd.concat(chunks)
+		theta.to_csv('/media/robin/dn/PCPLDA/theta.csv', index=False)
 
-	theta = pd.concat(chunks)
-	theta.to_csv('/media/robin/dn/PCPLDA/theta.csv', index=False)
-
-	#Nd = Nd.to_pandas()
-	
 
 
 
