@@ -4,7 +4,7 @@ from tqdm import tqdm
 import re
 from unidecode import unidecode
 import argparse
-
+import random
 
 def multiple_replace(text, i_start=192, i_end=383):
     d = [chr(c) for c in range(i_start, i_end + 1)]
@@ -26,12 +26,15 @@ class MalletDataset(IterableDataset):
         patterns = self.patterns
         line = line.lower()
         line = multiple_replace(line)
-        line = re.sub(patterns['digit_pattern'], '0', line)
         line = re.sub(patterns['character_pattern'], '', line)
+        line = re.sub(patterns['digit_pattern'], 'DIG', line)
         line = line.replace('-', '_')
         for key, value in patterns['grams'].items():
             line = line.replace(key, value)
-        line = ' '.join(line.split())
+        line = line.split()
+        line = [c.strip('_') for c in line if len(c) > 1]
+        random.shuffle(line)
+        line = ' '.join(line)
         return line+'\n'
 
     def line_mapper(self, line):
@@ -48,17 +51,18 @@ class MalletDataset(IterableDataset):
 def main(args):
     digit_pattern = re.compile(r'\d+')
     gram_pattern = re.compile(r'(?<=[a-zåäö])-(?=[a-zåäö])')
-    character_pattern = re.compile(r'[^a-zåäö0\s\_\-]')
+    character_pattern = re.compile(r'[^a-zåäö0-9\s\_\-]')
 
     # N-grams
     grams= {}
-    with open('topic_model/data/n_grams.txt') as file:
+    with open('topic_model/data/n_grams_v1.txt') as file:
         for line in file:
-            line = line.replace('\n', '')
-            line = line.lower()
-            line = multiple_replace(line)
-            line = re.sub(r'[^a-zåäö]+', '_', line)
-            grams[line] = line
+            text = line
+            text = text.replace('\n', '')
+            text = text.lower()
+            text = multiple_replace(text)
+            text = re.sub(r'[^a-zåäö]+', '_', text)
+            grams[line] = text
 
     patterns = {'digit_pattern':digit_pattern,
                 'gram_pattern':gram_pattern,

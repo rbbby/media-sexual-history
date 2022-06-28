@@ -12,60 +12,13 @@ from PCPLDA.results import (get_config, get_vocab, get_phi, get_seed_words,
 							learnt_words,
 							PosteriorDataset,
 							)
-from fpdf import FPDF
 import torch
 from torch.utils.data import DataLoader
 from operator import itemgetter
 from tqdm import tqdm
-
-
-def add_part(pdf, part, w, h):
-	pdf.set_font('Times', size=12, style='B')
-	pdf.cell(w, h, f'Part {part}', border = 0, ln = 1)
-	pdf.ln()
-
-def add_plot(pdf, plot, title, description, w, h):
-	pdf.set_font('Times', size=12, style='B')
-	pdf.cell(w, h, title, ln=1)
-	pdf.set_font('Times', size=12)
-	pdf.cell(w, h, description, ln=1)
-	pdf.ln()
-	pdf.image(plot, x=50, w=pdf.w/2.0)
-
-def output_df_to_pdf(pdf, df):
-	table_cell_width = 27.5
-	table_cell_height = 6
-	pdf.set_font('Arial', 'B', 8)
-
-	for col in df.columns:
-		pdf.cell(table_cell_width, table_cell_height, str(col), align='C', border=1)
-	pdf.ln(table_cell_height)
-	pdf.set_font('Arial', '', 8)
-	for _, row in df.iterrows():
-		for col in df.columns:
-			value = str(row[col])
-			pdf.cell(table_cell_width, table_cell_height, value, align='C', border=1)
-		pdf.ln(table_cell_height)
-
-def split_table(table, axis=0, chunk_size=10):
-	for i in range(0, table.shape[axis], chunk_size):
-		if axis == 0:
-			yield table[i:i + chunk_size]
-		else:
-			yield table.iloc[:, i:i + chunk_size]
-
-def add_table(pdf, table, title, description, w, h):
-	pdf.set_font('Times', size=12, style='B')
-	pdf.cell(w, h, title, border = 0, ln = 1)
-	pdf.set_font('Times', size=12)
-	pdf.cell(w, h, description, border = 0, ln = 1)
-	output_df_to_pdf(pdf, table)
-	pdf.ln()
-
-def split_text(text, chunk_size=12):
-	text = text.split()
-	for i in range(0, len(text), chunk_size):
-		yield ' '.join(text[i:i + chunk_size])
+from PCPLDA.report import (add_plot, add_part, output_df_to_pdf, split_table, add_table, split_text)
+import datatable as dt
+from tqdm import tqdm
 
 def main(args):
 	
@@ -73,6 +26,30 @@ def main(args):
 	
 	# Produce results
 	cfg = get_config(args.root)
+
+	alpha = float(cfg.get('alpha'))
+
+
+	chunksize = 10000
+	n_chunks = sum(1 for row in open('/media/robin/dn/PCPLDA/Nd.csv', 'r'))
+	print(n_chunks)
+
+	chunks = []
+	with pd.read_csv('/media/robin/dn/PCPLDA/Nd.csv', chunksize=chunksize, dtype=float) as reader:
+		for chunk in tqdm(reader, total=n_chunks):
+			chunk += alpha
+			chunks.append(chunk.div(chunk.sum(axis=1), axis=0))
+
+	theta = pd.concat(chunks)
+	theta.to_csv('/media/robin/dn/PCPLDA/theta.csv', index=False)
+
+	#Nd = Nd.to_pandas()
+	
+
+
+
+	return
+	alpha = float(cfg.get('alpha'))
 
 	def get_z_filepaths(root, cfg):
 		p = Path(root)
@@ -85,10 +62,21 @@ def main(args):
 		return z_files
 
 	z_files = get_z_filepaths(args.root, cfg)
-	
-	for line in zip(open(f) for f in z_files[:4]):
-		print(line)
-		
+
+	Nd = np.zeros(list(map(int, itemgetter('M', 'topics')(cfg))), dtype=int)
+	for z_file in z_files:
+		with open(z_file, 'r') as f:	
+			for i, line in tqdm(enumerate(f), total=len(Nd)):
+				topic_indicators = list(map(int, line.split(',')))
+				np.add.at(Nd[i], topic_indicators, 1)
+		break
+
+	#pd.read_parquet('df.parquet.gzip')
+
+#	theta = (Nd+alpha) / (Nd+alpha).sum(axis=1)[:, np.newaxis]
+#
+#	with open('/media/robin/dn/PCPLDA/theta.npy', 'wb') as f:
+#	    np.save(f, theta)
 
 #	import fileinput
 #	with fileinput.input(files=z_files) as f:
