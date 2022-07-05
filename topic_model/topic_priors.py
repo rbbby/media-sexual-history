@@ -26,7 +26,7 @@ def main(args):
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description=__doc__)
 	parser.add_argument("--filename", type=str, default="topic_model/data/topic_priors_sub_sex_v1.csv")
-	parser.add_argument("--topics", type=int)
+	parser.add_argument("--topics", "-K", type=int)
 	args = parser.parse_args()
 	main(args)
 
