@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import datatable as dt
+#import datatable as dt
 import matplotlib.pyplot as plt
 import os
 import re
@@ -84,24 +84,15 @@ def get_vocab(root):
 	return vocab
 
 
-def get_phi(root):
-	phi = dt.fread(os.path.join(root, 'phi-means.csv'))
-	phi = phi.to_pandas()
+def get_phi(root, datatable=False):
+	if datatable:
+		phi = dt.fread(os.path.join(root, 'phi-means.csv'))
+		phi = phi.to_pandas()
+	else:
+		phi = pd.read_csv(os.path.join(root, 'phi-means.csv'))	
 	vocab = get_vocab(root)
 	phi.columns = vocab
 	return phi
-
-
-def get_seed_words(root, cfg):
-	d = {}
-	with open(cfg.get('topic_prior_filename'), 'r') as f:
-		for line in f:
-#			if not re.search(r'^[0-9], ', line):
-#				continue
-			z, *seed_words = line.rstrip('\n').split(', ')
-			#d.update({word:int(z) for word in seed_words})
-			d.update({z:seed_words})
-	return d
 
 
 def plot_convergence(root):
@@ -172,67 +163,58 @@ def learnt_words(root, cfg, target_topic, n=50):
 	return phi
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Depreceated?
-
-def plot_topics(theta, normalize=False):
-	theta = theta.groupby(theta.index).mean()
-	if normalize:
-		theta = theta.div(theta.sum(axis=1), axis=0)
-	theta = pd.melt(theta.reset_index(), id_vars='year')
-
-	f, ax = plt.subplots()
-	for topic in sorted(set(theta['variable'])):
-		df_plot = theta[theta['variable'] == topic]
-		ax.plot(df_plot['year'], df_plot['value'], label=topic)
-
-	ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
-	          ncol=3, fancybox=True, shadow=True)
-	return f, ax
-
-
-def plot_topic_co_occurence(theta, topic, threshold):
-	theta = theta[theta[topic] > threshold]
-	theta = theta.drop(topic, axis=1)
-	f, ax = plot_topics(theta, normalize=True)
-	return f, ax
-
-
-def get_z_filepaths(root: str, burn_in: int):
-	z_files = []
-	for file in os.listdir(os.path.join(root, 'default')):
-		if not (z := regex.search(r'(?:z_)(\d+)', file)):
-			continue
-		if int(z.group(1)) < burn_in:
-			continue
-		z_files.append(os.path.join(root, 'default', file))
+def get_z_filepaths(root, cfg):
+	p = Path(root)
+	z_files = list(p.glob('default/z_[0-9]*.csv'))
+	iterations = int(cfg.get('iterations'))
+	percent_burn_in = int(cfg.get('phi_mean_burnin', 0)) / 100
+	burn_in = iterations * percent_burn_in
+	pattern = r'(?:z_)([0-9]+)(?:.csv)'
+	z_files = [f for f in z_files if burn_in <= int(re.search(pattern, str(f)).group(1))]
 	return z_files
 
 
-def stem_phi(phi):
-    # Create dictionary mapping of words and their stemmed versions
-    snowball = SnowballStemmer(language='swedish')
-    d = {c:snowball.stem(c) for c in phi.columns}
-    d = {key:value+('' if key == value else '*') for key, value in d.items()}
-    print(d)
-    for col in phi.columns:
-        try:
-            phi = phi.rename({col:d[col]})
-        except:
-            phi[d[col]] += phi[col]
-            phi = phi.drop(col)
-    return phi
+def get_seed_words(cfg):
+	df = pd.read_csv(cfg.get('topic_prior_filename').replace('txt', 'csv'), sep=';')
+	df = df[df['topic_id'] != -1]
+	df = df.drop_duplicates(subset=['topic', 'topic_id'])
+	df = df.sort_values('topic_id')
+	return {row['topic']:row['topic_id'] for _, row in df.iterrows()}
+
+
+def get_metadata(cfg):
+	M = int(cfg.get('M'))
+	dates = []
+	with open(cfg['dataset'], 'r') as f:
+		for line in tqdm(f, total=M):
+			dark_id, date, *_ = line.split('\t')
+			year, month, day = date.split('-')
+			dates.append(year) # only use year for now
+	return dark_id, dates
+
+
+def compute_theta(root, cfg):
+	alpha = float(cfg.get('alpha'))
+	M, K = list(map(int, itemgetter('M', 'topics')(cfg)))
+	z_files = get_z_filepaths(root, cfg)
+	Nd = np.zeros((M, K), dtype=float)
+	Nd += alpha * len(z_files)
+	for z_file in z_files:
+		with open(z_file, 'r') as f:	
+			for i, line in tqdm(enumerate(f), total=len(Nd)):
+				if not line.isspace():
+					topic_indicators = list(map(int, line.split(',')))
+					np.add.at(Nd[i], topic_indicators, 1)
+	theta = Nd / Nd.sum(axis=1)[:, np.newaxis]
+	return theta
+
+def plot_topic_salience(theta, time, seed_dict):
+	theta = theta.groupby('time').mean()
+	cc = (cycler(color=list('bgrcmyk')) *
+	      cycler(linestyle=['-', '--', '-.', '-', '--', '-.', '-']))
+	fig, ax = plt.subplots()
+	ax.set_prop_cycle(cc)
+	for key in seed_dict.keys():
+		ax.plot(theta.index, theta[key], label=key)
+	ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+	return fig, ax
