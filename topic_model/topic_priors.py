@@ -9,7 +9,7 @@ def main(args):
 	df = pd.read_csv(args.filename, sep=';')
 	
 	df = df.sort_values(by=['topic_id', 'topic', 'theme', 'word']).reset_index(drop=True)
-	f = open(args.filename.replace('csv', 'txt'), 'w')
+	f = open(args.filename.replace('.csv', f'_{args.topics}.txt'), 'w')
 	topics = sorted([k for k in set(df['topic_id']) if k != -1])
 	for i in topics:
 		line = df.loc[df['topic_id'] == i, 'word']
