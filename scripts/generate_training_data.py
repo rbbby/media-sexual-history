@@ -36,7 +36,8 @@ def sample_pages(archive, dark_ids):
 def main(args):
     with open(args.credentials, 'r') as f:
 	    credentials = f.read().rstrip('\n')
-    a = kblab.Archive('https://betalab.kb.se', auth=('demo', credentials))
+    lab = ('beta' if args.betalab else 'data') + 'lab'
+    a = kblab.Archive(f'https://{lab}.kb.se', auth=('demo', credentials))
     dark_ids = sample_issues(a, args)
     df = sample_pages(a, dark_ids)
     df.to_csv('classifier/sample.csv', index=False)
@@ -48,7 +49,8 @@ if __name__ == "__main__":
     parser.add_argument("--seed", type=int, default=123)
     parser.add_argument("--start", type=int, default=1900)
     parser.add_argument("--end", type=int, default=2022)
-    parser.add_argument("--credentials", type=str, help="Path to KB API credentials txt file") # /Users/robsa662/misc/keys/kb-api-credentials.txt
+    parser.add_argument("--credentials", type=str, help="Path to KB API credentials txt file") # /Users/username/path/to/credentials.txt
     parser.add_argument("--label", type=str, help="API label with escaped whitespace") # DAGENS\ NYHETER
+    parser.add_argument('--betalab', action=argparse.BooleanOptionalAction) # to access betalab.kb.se for non copyrighted data
     args = parser.parse_args()
     main(args)
