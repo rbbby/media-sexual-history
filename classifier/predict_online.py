@@ -46,9 +46,8 @@ def get_data(package_id, threshold=20):
 	    dark_ids = set(df.loc[df['date'] == date, 'dark_id'])
 	    if len(dark_ids) > 1:
 	    	duplicates = [d for d in dark_ids if d not in random.sample(dark_ids, 1)]
-	    	print(df)
-	    	df = df[df['dark_id'] not in duplicates].reset_index(drop=True)
-	    	print(df)
+	    	df = df[~df['dark_id'].isin(duplicates)].reset_index(drop=True)
+	    	
 	return df
 
 def predict_df(df, model, device):
