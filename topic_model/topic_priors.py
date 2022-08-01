@@ -1,13 +1,11 @@
 '''
 Topic priors from csv to Mallet format 
-TODO: use spacy(?) to add all inflexions
 '''
 import pandas as pd
 import argparse
 
 def main(args):
 	df = pd.read_csv(args.filename, sep=';')
-	
 	df = df.sort_values(by=['topic_id', 'topic', 'theme', 'word']).reset_index(drop=True)
 	f = open(args.filename.replace('.csv', f'_{args.topics}.txt'), 'w')
 	topics = sorted([k for k in set(df['topic_id']) if k != -1])
@@ -25,7 +23,7 @@ def main(args):
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description=__doc__)
-	parser.add_argument("--filename", type=str, default="topic_model/data/topic_priors_sub_sex_v1.csv")
+	parser.add_argument("--filename", type=str, default="topic_model/data/topic_priors_sub_sex.csv")
 	parser.add_argument("--topics", "-K", type=int)
 	args = parser.parse_args()
 	main(args)

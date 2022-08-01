@@ -9,10 +9,13 @@ import os
 import torch
 import torch.nn as nn
 import numpy as np
-from src.dataset import *
-from src.evaluation import *
-from src.models import *
+from src.dataset import MediaDataset
+from src.evaluation import predict
+from src.models import BertMetaClassifier
 import transformers
+from datetime import date
+import random
+
 
 def get_data(package_id, threshold=20):
 	data = []
@@ -25,6 +28,7 @@ def get_data(package_id, threshold=20):
 		year = date.year
 		date = date.strftime("%Y-%m-%d")
 		for res in result:
+			# Select part 1
 			if not res['@id'].split('#')[-1].split('-')[0] == str(1):
 				continue
 			if res['content']:
@@ -33,14 +37,26 @@ def get_data(package_id, threshold=20):
 					idx = res['@id'].split('/')[-1]
 					data.append([idx, date, year, weekday, text])
 
-	return pd.DataFrame(data, columns=['idx', 'date', 'year', 'weekday', 'text'])
+	df = pd.DataFrame(data, columns=['idx', 'date', 'year', 'weekday', 'content'])
+	
+	# Sample duplicate papers
+	df['dark_id'] = df['idx'].apply(lambda x: x.split('#')[0])
+	dates = set(df['date'])
+	for date in dates:
+	    dark_ids = set(df.loc[df['date'] == date, 'dark_id'])
+	    if len(dark_ids) > 1:
+	    	duplicates = [d for d in dark_ids if d not in random.sample(dark_ids, 1)]
+	    	print(df)
+	    	df = df[df['dark_id'] not in duplicates].reset_index(drop=True)
+	    	print(df)
+	return df
 
-def predict_df(df, model):
-	df['label'] = np.ones(len(df))
+def predict_df(df, model, device):
+	df['tag'] = np.ones(len(df))
 	dataset_test = MediaDataset(df=df)
 	testloader = torch.utils.data.DataLoader(
 	    dataset_test, batch_size=16, shuffle=False, num_workers=4)
-	df, _ = predict(df, testloader, model=model)
+	df, _ = predict(df, testloader, model=model, device=device)
 	df = df[df['pred'] == 1]
 	return df
 
@@ -49,10 +65,10 @@ with open('../../keys/kb-credentials.txt', 'r') as file:
     pw = file.read().replace('\n', '')
 a = Archive("https://datalab.kb.se", auth=("demo", pw))
 
-outfile = "/media/robin/dn/dn.txt"
+outfile = f"/media/robin/dn/dn_{date.today().strftime('%b-%d-%Y')}.txt"
 n_words = 20
 model = BertMetaClassifier()
-model.load_state_dict(torch.load(f'models/best_model_{n_words}.pth')['model_state_dict'])
+model.load_state_dict(torch.load(f'classifier/models/best_model_{n_words}.pth')['model_state_dict'])
 model.cuda()
 
 try:
@@ -60,7 +76,7 @@ try:
 except:
 	pass
 
-for year in range(1900, 2022):
+for year in range(2000, 2022):
 	print(f"Year {year} started.")
 	package_ids = a.search({"label": "DAGENS NYHETER", "meta.created": year})
 	with multiprocessing.Pool() as pool:
@@ -68,8 +84,9 @@ for year in range(1900, 2022):
 		for df in tqdm(pool.imap(get_data, package_ids), total=package_ids.n):
 			data.append(df)
 	df = pd.concat(data).reset_index(drop=True)
-	df = predict_df(df, model)
+	df = predict_df(df, model, device="cuda")
 
 	# Mallet format dataset
 	df = df[['idx', 'date', 'text']]
 	df.to_csv(outfile, header=None, index=None, sep='\t', mode='a')
+

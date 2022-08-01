@@ -9,6 +9,7 @@ from src.evaluation import predict, get_metrics
 from src.models import BertMetaClassifier
 import transformers
 import argparse
+from datetime import date
 
 
 def prepare_data(args):
@@ -112,13 +113,13 @@ def main(args):
     # Args
     df_train, df_valid, df_test, dataloader, valid_loader, test_loader = prepare_data(args)
     train(args, df_train, df_valid, dataloader, valid_loader)
-    
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model_filename", default="model.pth", type=str) # should have .pth suffix
+    parser.add_argument("--model_filename", default=f"model_{date.today().strftime("%b-%d-%Y")}.pth", type=str) # should have .pth suffix
     parser.add_argument("--device", default="cuda", type=str)
-    parser.add_argument("--filename", type=str, default='classifier/toy_training_data.csv') # annotated pages from sample
+    parser.add_argument("--filename", type=str, default='dataset/toy_data.csv') # annotated pages from sample
     parser.add_argument("--seed", type=int, default=123)
     parser.add_argument("--n_epochs", type=int, default=10)
     parser.add_argument("--batch_size", type=int, default=16)

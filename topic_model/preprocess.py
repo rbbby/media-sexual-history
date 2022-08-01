@@ -29,7 +29,7 @@ def process_text(text, grams):
 
 def main(args):
     grams = {}
-    with open("topic_model/data/n_grams_v1.txt") as file:
+    with open("topic_model/data/n_grams.txt") as file:
         for line in file:
             text = line
             text = text.replace("\n", "")

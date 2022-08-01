@@ -1,6 +1,5 @@
 import re
 import pandas as pd
-
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import kblab
@@ -45,6 +44,7 @@ def main(args):
                 # Skip if we already have annotated this observation
                 if row['@id'] in ids:
                     continue
+                
                 
                 id, type, box, content = itemgetter('@id', '@type', 'box', 'content')(row)
                 tag = 0 # label all textblocks as 0
