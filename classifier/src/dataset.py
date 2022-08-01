@@ -24,10 +24,10 @@ class MediaDataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
 
         df_row = self.df.iloc[index]
-        label = df_row["label"]
+        label = df_row["tag"]
 
         # Text
-        ocr_text = df_row["text"]
+        ocr_text = df_row["content"]
         token_info = self.tokenizer.encode_plus(ocr_text,
                                                 max_length=64,
                                                 truncation=True,
