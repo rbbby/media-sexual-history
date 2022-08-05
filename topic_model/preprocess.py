@@ -8,17 +8,19 @@ from tqdm import tqdm
 import os
 
 
-def multiple_replace(text, i_start=192, i_end=383):
+def multiple_replace(text, grams=None, i_start=192, i_end=383):
     d = [chr(c) for c in range(i_start, i_end + 1)]
     d = {c: unidecode(c) for c in d if c not in "åäö"}
+    if grams:
+        d = {**d, **grams}
     regex = re.compile("(%s)" % "|".join(map(re.escape, d.keys())))
     return regex.sub(lambda mo: d[mo.string[mo.start() : mo.end()]], text)
 
 
-def process_text(text, grams):
+def process_text(text, grams=None):
     text = text.lower()
     text = text.replace("-", "_")
-    text = multiple_replace(text)
+    text = multiple_replace(text, grams)
     text = re.sub(r"[^a-zåäö\s\_]", "", text)
     text = text.split()
     text = [c.strip("_") for c in text if len(c) > 1 and len(c) < 50]
