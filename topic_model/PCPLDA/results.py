@@ -6,50 +6,11 @@ import os
 import re
 from nltk.stem import SnowballStemmer
 from pathlib import Path
-import torch
-from torch.utils.data import IterableDataset
 from plotnine import ggplot, aes, geom_line, geom_abline, ggtitle, scale_x_discrete, scale_y_discrete, theme
 from functools import partial
 import multiprocessing
 from tqdm import tqdm
 from operator import itemgetter
-
-
-class PosteriorDataset(IterableDataset):
-	'''
-	Pytorch iterable dataset for postprocessing Mallet results.
-	Iterates over z_files and processed corpus jointly in parallel.
-	'''
-	def __init__(self, root, cfg):
-		p = Path(root)
-		
-		# Topic indicator filepaths after burn_in period
-		# NOTE: only uses last draw atm
-		z_files = list(p.glob('default/z_[0-9]*.csv'))
-		iterations = int(cfg.get('iterations'))
-		percent_burn_in = int(cfg.get('phi_mean_burnin', 0)) / 100
-		burn_in = iterations * percent_burn_in
-		pattern = r'(?:z_)([0-9]+)(?:.csv)'
-		z_files = [f for f in z_files if burn_in <= int(re.search(pattern, str(f)).group(1))]
-		self.topics = z_files[:2] # TESTING
-
-	def process_line(self, row):
-		topics = row
-		topics = topics.replace('\n', '')
-		topics = topics.split(',')
-		topics = list(map(int, topics))
-		return topics
-
-	def line_mapper(self, topic):
-		topics = list(map(self.process_line, topic))
-		return topics
-
-	def __iter__(self):
-		topic_itr = (open(f) for f in self.topics)
-		mapped_itr = map(self.line_mapper, topic_itr)
-		for i in mapped_itr:
-			print(i)
-		return mapped_itr
 
 
 def get_config(root):
