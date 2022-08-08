@@ -11,6 +11,7 @@ from functools import partial
 import multiprocessing
 from tqdm import tqdm
 from operator import itemgetter
+import datatable as dt
 
 
 def get_config(root):
@@ -48,15 +49,20 @@ def get_vocab(root):
 	return vocab
 
 
-def get_phi(root, chunksize):
-	data = []
-	for chunk in pd.read_csv(
-		os.path.join(root, 'phi-means.csv'),
-		header=None, dtype=float, chunksize=chunksize):
-		data.append(chunk)
+def get_phi(root, chunksize, datatable=True):
+	if datatable:
+		df = dt.fread(os.path.join(root, 'phi-means.csv'), header=None)
+		df = df.to_pandas()
+
+	else:
+		data = []
+		for chunk in pd.read_csv(
+			os.path.join(root, 'phi-means.csv'),
+			header=None, dtype=float, chunksize=chunksize):
+			data.append(chunk)
+		df = pd.concat(data, ignore_index=True)
 
 	vocab = get_vocab(root)
-	df = pd.concat(data, ignore_index=True)
 	df.columns = vocab.keys()
 	return df
 
