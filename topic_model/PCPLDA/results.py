@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-#import datatable as dt
 import matplotlib.pyplot as plt
 import os
 import re
@@ -11,7 +10,6 @@ from functools import partial
 import multiprocessing
 from tqdm import tqdm
 from operator import itemgetter
-import datatable as dt
 
 
 def get_config(root):
@@ -49,16 +47,21 @@ def get_vocab(root):
 	return vocab
 
 
-def get_phi(root, chunksize, datatable=True):
+def get_phi(root, chunksize, datatable=False):
 	if datatable:
+		import datatable as dt
 		df = dt.fread(os.path.join(root, 'phi-means.csv'), header=None)
 		df = df.to_pandas()
 
 	else:
+		with open(os.path.join(root, 'phi-means.csv'), 'r') as f:
+			n = sum(1 for line in f)
+		
 		data = []
-		for chunk in pd.read_csv(
-			os.path.join(root, 'phi-means.csv'),
-			header=None, dtype=float, chunksize=chunksize):
+		for chunk in tqdm(
+			pd.read_csv(os.path.join(root, 'phi-means.csv'), 
+				header=None, dtype=float, chunksize=chunksize), 
+				total= n // chunksize):
 			data.append(chunk)
 		df = pd.concat(data, ignore_index=True)
 
