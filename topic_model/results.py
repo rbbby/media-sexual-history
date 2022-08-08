@@ -33,8 +33,8 @@ def main(args):
 	# Load matrices
 	#print('Computing phi')
 	#phi = get_phi(args.root, chunksize=args.chunksize)
-	#print('Computing document term matrix')
-	#Nd = compute_document_topic_matrix(args.root, cfg)
+	print('Computing document term matrix')
+	Nd = compute_document_topic_matrix(args.root, cfg)
 
 	# Tables
 	#print('Producing tables')
