@@ -54,14 +54,15 @@ def get_phi(root, chunksize, datatable=False):
 		df = df.to_pandas()
 
 	else:
+		# Read number of lines in phi to get progressbar
 		with open(os.path.join(root, 'phi-means.csv'), 'r') as f:
 			n = sum(1 for line in f)
 		
 		data = []
 		for chunk in tqdm(
 			pd.read_csv(os.path.join(root, 'phi-means.csv'), 
-				header=None, dtype=float, chunksize=chunksize), 
-				total= n // chunksize):
+				header=None, dtype=float, chunksize=10), 
+				total= n // 10):
 			data.append(chunk)
 		df = pd.concat(data, ignore_index=True)
 

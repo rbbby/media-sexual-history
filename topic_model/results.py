@@ -20,7 +20,6 @@ from PCPLDA.results import (get_config, get_vocab, get_phi, get_seed_words,
 def main(args):
 	# Config
 	cfg = get_config(args.root)
-	cfg['iterations'] = '2000' # for debugging
 
 	# Create output folder
 	out_dir = os.path.join(args.root, 'result')
@@ -32,18 +31,18 @@ def main(args):
 	p.savefig(f'{out_dir}/convergence.png', dpi=300)
 
 	# Load matrices
-	print('Computing phi')
-	phi = get_phi(args.root, chunksize=args.chunksize)
-	print('Computing document term matrix')
-	Nd = compute_document_topic_matrix(args.root, cfg)
+	#print('Computing phi')
+	#phi = get_phi(args.root, chunksize=args.chunksize)
+	#print('Computing document term matrix')
+	#Nd = compute_document_topic_matrix(args.root, cfg)
 
 	# Tables
-	print('Producing tables')
-	top, relevance = table_words(args.root, cfg, phi=phi, n=args.n, top=True, relevance=True)
-	learnt = learnt_words(args.root, cfg, phi, n=args.n)
-	top.to_csv(f'{out_dir}/top_words.csv', index=False)
-	relevance.to_csv(f'{out_dir}/relevance_words.csv', index=False)
-	learnt.to_csv(f'{out_dir}/learnt_words.csv', index=False)
+	#print('Producing tables')
+	#top, relevance = table_words(args.root, cfg, phi=phi, n=args.n, top=True, relevance=True)
+	#learnt = learnt_words(args.root, cfg, phi, n=args.n)
+	#top.to_csv(f'{out_dir}/top_words.csv', index=False)
+	#relevance.to_csv(f'{out_dir}/relevance_words.csv', index=False)
+	#learnt.to_csv(f'{out_dir}/learnt_words.csv', index=False)
 
 	# Co-occurence matrix
 	# Topic correlation heatmap
