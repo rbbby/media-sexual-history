@@ -60,32 +60,40 @@ def predict_df(df, model, device):
 	return df
 
 
-with open('../../keys/kb-credentials.txt', 'r') as file:
-    pw = file.read().replace('\n', '')
-a = Archive("https://datalab.kb.se", auth=("demo", pw))
+def main(args):
+	with open(args.credentials, 'r') as file:
+	    pw = file.read().replace('\n', '')
+	a = Archive("https://datalab.kb.se", auth=("demo", pw))
 
-outfile = f"/media/robin/dn/dn_{date.today().strftime('%b-%d-%Y')}.txt"
-n_words = 20
-model = BertMetaClassifier()
-model.load_state_dict(torch.load(f'classifier/models/best_model_{n_words}.pth')['model_state_dict'])
-model.cuda()
+	model = BertMetaClassifier()
+	model.load_state_dict(torch.load(args.model_filename)['model_state_dict'])
+	model.cuda()
 
-try:
-	os.remove(outfile)
-except:
-	pass
+	try:
+		os.remove(args.outfile)
+	except:
+		pass
 
-for year in range(2000, 2022):
-	print(f"Year {year} started.")
-	package_ids = a.search({"label": "DAGENS NYHETER", "meta.created": year})
-	with multiprocessing.Pool() as pool:
-		data = []
-		for df in tqdm(pool.imap(get_data, package_ids), total=package_ids.n):
-			data.append(df)
-	df = pd.concat(data).reset_index(drop=True)
-	df = predict_df(df, model, device="cuda")
+	for year in range(2000, 2022):
+		print(f"Year {year} started.")
+		package_ids = a.search({"label": "DAGENS NYHETER", "meta.created": year})
+		with multiprocessing.Pool() as pool:
+			data = []
+			for df in tqdm(pool.imap(get_data, package_ids), total=package_ids.n):
+				data.append(df)
+		df = pd.concat(data).reset_index(drop=True)
+		df = predict_df(df, model, device=args.device)
 
-	# Mallet format dataset
-	df = df[['idx', 'date', 'text']]
-	df.to_csv(outfile, header=None, index=None, sep='\t', mode='a')
+		# Mallet format dataset
+		df = df[['idx', 'date', 'text']]
+		df.to_csv(args.outfile, header=None, index=None, sep='\t', mode='a')
 
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model_filename", type=str) # path/to/model.pth
+    parser.add_argument("--outfile", default="corpus.txt", type=str)
+    parser.add_argument("--device", default="cuda", type=str)
+    parser.add_argument("--credentials", type=str) # path/to/credentials.txt
+    args = parser.parse_args()
+    main(args)
