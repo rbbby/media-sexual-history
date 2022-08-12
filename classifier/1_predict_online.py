@@ -74,7 +74,7 @@ def main(args):
 	except:
 		pass
 
-	for year in range(2000, 2022):
+	for year in range(args.start, args.end):
 		print(f"Year {year} started.")
 		package_ids = a.search({"label": "DAGENS NYHETER", "meta.created": year})
 		with multiprocessing.Pool() as pool:
@@ -91,6 +91,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--start", type=int) # start year
+    parser.add_argument("--end", type=int) # end year
     parser.add_argument("--model_filename", type=str) # path/to/model.pth
     parser.add_argument("--outfile", default="corpus.txt", type=str)
     parser.add_argument("--device", default="cuda", type=str)
