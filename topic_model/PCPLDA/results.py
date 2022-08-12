@@ -183,13 +183,15 @@ def get_seed_words(root, cfg):
 
 def get_metadata(cfg):
 	M = int(cfg.get('M'))
+	dark_ids = []
 	dates = []
 	with open(cfg['dataset'], 'r') as f:
 		for line in tqdm(f, total=M):
 			dark_id, date, *_ = line.split('\t')
 			year, month, day = date.split('-')
-			dates.append(year) # only use year for now
-	return dark_id, dates
+			dates.append(int(year)) # only use year for now
+			dark_ids.append(dark_id)
+	return dark_ids, dates
 
 
 def compute_document_topic_matrix(root, cfg):
