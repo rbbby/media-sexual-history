@@ -1,57 +1,20 @@
 import numpy as np
 import pandas as pd
-#import datatable as dt
 import matplotlib.pyplot as plt
 import os
 import re
 from nltk.stem import SnowballStemmer
 from pathlib import Path
-import torch
-from torch.utils.data import IterableDataset
 from plotnine import ggplot, aes, geom_line, geom_abline, ggtitle, scale_x_discrete, scale_y_discrete, theme
 from functools import partial
 import multiprocessing
 from tqdm import tqdm
-
-class PosteriorDataset(IterableDataset):
-	'''
-	Pytorch iterable dataset for postprocessing Mallet results.
-	Iterates over z_files and processed corpus jointly in parallel.
-	'''
-	def __init__(self, root, cfg):
-		p = Path(root)
-		
-		# Topic indicator filepaths after burn_in period
-		# NOTE: only uses last draw atm
-		z_files = list(p.glob('default/z_[0-9]*.csv'))
-		iterations = int(cfg.get('iterations'))
-		percent_burn_in = int(cfg.get('phi_mean_burnin', 0)) / 100
-		burn_in = iterations * percent_burn_in
-		pattern = r'(?:z_)([0-9]+)(?:.csv)'
-		z_files = [f for f in z_files if burn_in <= int(re.search(pattern, str(f)).group(1))]
-		self.topics = z_files[:2] # TESTING
-
-	def process_line(self, row):
-		topics = row
-		topics = topics.replace('\n', '')
-		topics = topics.split(',')
-		topics = list(map(int, topics))
-		return topics
-
-	def line_mapper(self, topic):
-		topics = list(map(self.process_line, topic))
-		return topics
-
-	def __iter__(self):
-		topic_itr = (open(f) for f in self.topics)
-		mapped_itr = map(self.line_mapper, topic_itr)
-		for i in mapped_itr:
-			print(i)
-		return mapped_itr
+from operator import itemgetter
 
 
 def get_config(root):
 	# Use convergence file to find config file
+	print(root)
 	f = open(os.path.join(root, "defaultConvergence.txt"))
 	for line in f:
 		if match := re.search(r'(?:--run_config=)(.*)', line):
@@ -84,15 +47,28 @@ def get_vocab(root):
 	return vocab
 
 
-def get_phi(root, datatable=False):
+def get_phi(root, chunksize, datatable=False):
 	if datatable:
-		phi = dt.fread(os.path.join(root, 'phi-means.csv'))
-		phi = phi.to_pandas()
+		import datatable as dt
+		df = dt.fread(os.path.join(root, 'phi-means.csv'), header=None)
+		df = df.to_pandas()
+
 	else:
-		phi = pd.read_csv(os.path.join(root, 'phi-means.csv'))	
+		# Read number of lines in phi to get progressbar
+		with open(os.path.join(root, 'phi-means.csv'), 'r') as f:
+			n = sum(1 for line in f)
+		
+		data = []
+		for chunk in tqdm(
+			pd.read_csv(os.path.join(root, 'phi-means.csv'), 
+				header=None, dtype=float, chunksize=10), 
+				total= n // 10):
+			data.append(chunk)
+		df = pd.concat(data, ignore_index=True)
+
 	vocab = get_vocab(root)
-	phi.columns = vocab
-	return phi
+	df.columns = vocab.keys()
+	return df
 
 
 def plot_convergence(root):
@@ -109,58 +85,75 @@ def plot_convergence(root):
 	return p
 
 
-def table_words(root, cfg, n=20, top_words=True):
+def table_words(root, cfg, phi, n=20, top=True, relevance=True):
 	seed_words = get_seed_words(root, cfg)
-	seed_topics = list(map(int, seed_words.keys()))
+	seed_topics = list(sorted(set(seed_words['topic_id'])))
+	tables = []
+	if top:
+		d = {}
+		for i, row in phi.loc[seed_topics].iterrows():
+			d[i] = list(row.nlargest(n).index)
+		tables.append(pd.DataFrame(d))
 
-	phi = get_phi(root)
-	if not top_words:
+	if relevance:
 		phi = phi.div(phi.sum(axis=0), axis=1)
-	phi = phi.loc[seed_topics]
-
-	d = {}
-	for i, row in phi.iterrows():
-		d[i] = list(row.nlargest(n).index)
-	return pd.DataFrame(d)
+		for i, row in phi.loc[seed_topics].iterrows():
+			d[i] = list(row.nlargest(n).index)
+		tables.append(pd.DataFrame(d))
+	
+	return tables
 
 
 def no_co_location_line(line, target_topic_indices):
 	text = line
-	text = text.replace('\n', '')
+	text = text.rstrip('\n')
 	text = text.split(',')
 	text = list(map(int, text))
 	for i in target_topic_indices:
+		print(i)
 		if i in text:
 			return text
 
 
-def learnt_words(root, cfg, target_topic, n=50):
-	'''
-	Top n words with:
-		1. highest prob to occur in target topic
-		2. no cooccurences with target topic seeded words.
-
-	'''
-	seed_words = get_seed_words(root, cfg)
-	vocab = get_vocab(root)
-	target_topic_words = seed_words.get(f'{target_topic}')	
-	target_topic_indices = [value for key, value in vocab.items() if key in target_topic_words]
-
-	phi = get_phi(root)
-	phi = phi.loc[target_topic]
-	phi = phi.drop(target_topic_words, errors='ignore')
-
-	process_func = partial(no_co_location_line, target_topic_indices=target_topic_indices)
-
-	with multiprocessing.Pool() as pool:
-		with open(os.path.join(root, 'default/corpus.txt'), 'r') as f:
-			for idx in tqdm(pool.imap(process_func, f), total=int(cfg['M'])):
-				if idx:
-					phi = phi.drop(idx, errors='ignore')
+def learnt_words_for_single_topic(root, k, phi, seed_words, n):
+	phi = phi.loc[k]
+	target_seed_words = seed_words.loc[seed_words['topic_id'] == k, 'word'].tolist()
+	phi = phi.drop(target_seed_words, errors='ignore')
+	with open(os.path.join(root, 'default/corpus.txt'), 'r') as f:
+		for line in f:
+			text = line
+			text = text.rstrip('\n')
+			text = text.split('\t')[-1]
+			text = text.split()
+			if any(w for w in text if w in target_seed_words):
+				phi = phi.drop(text, errors='ignore')
 
 	phi = phi.sort_values(ascending=False)[:n]
-	phi = pd.DataFrame({'word':phi.index, 'probability':phi}).reset_index(drop=True)
-	return phi
+	return list(phi.index)
+
+
+def learnt_words(root, cfg, phi, n=5):
+	'''
+	Top n words with:
+		1. highest prob to occur in seeded topics
+		2. no cooccurences with target topic seeded words.
+
+	'''	
+	seed_words = get_seed_words(root, cfg)
+	seed_topics = list(sorted(set(seed_words['topic_id'])))
+
+	# We wont need the other rows
+	phi = phi.loc[seed_topics]
+
+	data = []
+	for k in seed_topics:
+		learnt_words_k = learnt_words_for_single_topic(root, k, phi, seed_words, n)
+		data.append(learnt_words_k)
+
+	# Transpose list of lists
+	data = list(map(list, zip(*data)))
+	df = pd.DataFrame(data, columns=seed_topics)
+	return df
 
 
 def get_z_filepaths(root, cfg):
@@ -174,12 +167,18 @@ def get_z_filepaths(root, cfg):
 	return z_files
 
 
-def get_seed_words(cfg):
-	df = pd.read_csv(cfg.get('topic_prior_filename').replace('txt', 'csv'), sep=';')
-	df = df[df['topic_id'] != -1]
-	df = df.drop_duplicates(subset=['topic', 'topic_id'])
-	df = df.sort_values('topic_id')
-	return {row['topic']:row['topic_id'] for _, row in df.iterrows()}
+def get_seed_words(root, cfg):
+	with open(cfg.get('topic_prior_filename'), 'r') as f:
+		data = []
+		for line in f:
+			topic_id, *words = line.rstrip('\n').split(', ')
+			for word in words:
+				data.append([int(topic_id), word])
+		df = pd.DataFrame(data, columns=['topic_id', 'word'])
+		# Drop all duplicated rows to get rid of anti topics
+		df = df.drop_duplicates(keep=False)
+		df = df.sort_values('topic_id')
+	return df
 
 
 def get_metadata(cfg):
@@ -191,6 +190,22 @@ def get_metadata(cfg):
 			year, month, day = date.split('-')
 			dates.append(year) # only use year for now
 	return dark_id, dates
+
+
+def compute_document_topic_matrix(root, cfg):
+		M, K = list(map(int, itemgetter('M', 'topics')(cfg)))
+		z_files = get_z_filepaths(root, cfg)
+		Nd = np.zeros((M, K), dtype=float)
+		
+		for z_file in z_files:
+			with open(z_file, 'r') as f:	
+				for i, line in tqdm(enumerate(f), total=len(Nd)):
+					if not line.isspace():
+						topic_indicators = list(map(int, line.split(',')))
+						np.add.at(Nd[i], topic_indicators, 1)
+
+		# Take sample average over runs
+		return Nd / len(z_files)
 
 
 def compute_theta(root, cfg):

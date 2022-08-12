@@ -7,7 +7,7 @@ import pandas as  pd
 from plotnine import ggplot, aes, geom_line, geom_abline, ggtitle, scale_x_discrete, scale_y_discrete
 
 
-def predict(df, testloader, model):
+def predict(df, testloader, model, device):
     """
     Args:
         mix (bool): True if both global and local image features were used.
@@ -25,11 +25,11 @@ def predict(df, testloader, model):
             mask = batch[0]["attention_mask"].squeeze(dim=1)
             numeric_features = batch[2]
             categorical_features = batch[3]
-            output = model(token_ids=token_ids.to("cuda"),
-                           type_ids=type_ids.to("cuda"),
-                           mask=mask.to("cuda"),
-                           numeric_features=numeric_features.to("cuda"),
-                           categorical_features=categorical_features.to("cuda"))
+            output = model(token_ids=token_ids.to(device),
+                           type_ids=type_ids.to(device),
+                           mask=mask.to(device),
+                           numeric_features=numeric_features.to(device),
+                           categorical_features=categorical_features.to(device))
 
             labels = labels.unsqueeze(1).type_as(output)
             loss = loss_fn(output, labels)
@@ -48,14 +48,14 @@ def predict(df, testloader, model):
 
 def get_metrics(df):
     metrics = {
-        "accuracy": accuracy_score(y_true=df["label"], y_pred=df["pred"]),
-        "f1": f1_score(y_true=df["label"], y_pred=df["pred"]),
-        "precision": precision_score(y_true=df["label"], y_pred=df["pred"]),
+        "accuracy": accuracy_score(y_true=df["tag"], y_pred=df["pred"]),
+        "f1": f1_score(y_true=df["tag"], y_pred=df["pred"]),
+        "precision": precision_score(y_true=df["tag"], y_pred=df["pred"]),
         # Sensitivity (# correct ad preds / # true ads)
-        "sensitivity": recall_score(y_true=df["label"], y_pred=df["pred"]),
+        "sensitivity": recall_score(y_true=df["tag"], y_pred=df["pred"]),
         # Specificity (# correct editorial preds / # true editorial)
-        "specificity": recall_score(y_true=df["label"], y_pred=df["pred"], pos_label=0),
-        "roc_auc": roc_auc_score(y_true=df["label"], y_score=df["probs"])
+        "specificity": recall_score(y_true=df["tag"], y_pred=df["pred"], pos_label=0),
+        "roc_auc": roc_auc_score(y_true=df["tag"], y_score=df["probs"])
     }
 
     print(metrics)
@@ -63,7 +63,7 @@ def get_metrics(df):
 
 
 def plot_roc_auc(df):
-    fpr, tpr, threshold = roc_curve(df["label"], df["probs"])
+    fpr, tpr, threshold = roc_curve(df["tag"], df["probs"])
     df_plot = pd.DataFrame(dict(fpr=fpr, tpr=tpr))
 
     p = (

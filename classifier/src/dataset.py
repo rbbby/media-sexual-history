@@ -2,32 +2,22 @@ import torch
 import os
 
 class MediaDataset(torch.utils.data.Dataset):
-    """Dataset with cropped images and text from OCR performed on newspapers."""
-
     def __init__(self, df):
-        """
-        Args:
-            df (DataFrame): DataFrame with text, image path and label annotations.
-            transform (callable, optional): Optional transform to be applied
-                on a sample.
-            mix (bool): True if model uses both global and local image features, False otherwise.
-            global_features: True if only global image features are used
-        """
         self.df = df
         self.tokenizer = torch.hub.load('huggingface/pytorch-transformers',
                                         'tokenizer',
-                                        'KB/bert-base-swedish-cased')  # Download vocabulary from S3 and cache.
-
+                                        'KB/bert-base-swedish-cased')
+        
     def __len__(self):
         return len(self.df)
 
     def __getitem__(self, index):
 
         df_row = self.df.iloc[index]
-        label = df_row["label"]
+        label = df_row["tag"]
 
         # Text
-        ocr_text = df_row["text"]
+        ocr_text = df_row["content"]
         token_info = self.tokenizer.encode_plus(ocr_text,
                                                 max_length=64,
                                                 truncation=True,

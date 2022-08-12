@@ -1,4 +1,0 @@
-wrong_token,true_token
-aaffären,affären
-aaning,aning
-
