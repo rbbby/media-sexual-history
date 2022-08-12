@@ -31,18 +31,19 @@ def main(args):
 	p.savefig(f'{out_dir}/convergence.png', dpi=300)
 
 	# Load matrices
-	#print('Computing phi')
-	#phi = get_phi(args.root, chunksize=args.chunksize)
 	print('Computing document term matrix')
 	Nd = compute_document_topic_matrix(args.root, cfg)
 
 	# Tables
-	#print('Producing tables')
-	#top, relevance = table_words(args.root, cfg, phi=phi, n=args.n, top=True, relevance=True)
-	#learnt = learnt_words(args.root, cfg, phi, n=args.n)
-	#top.to_csv(f'{out_dir}/top_words.csv', index=False)
-	#relevance.to_csv(f'{out_dir}/relevance_words.csv', index=False)
-	#learnt.to_csv(f'{out_dir}/learnt_words.csv', index=False)
+	if args.tables:
+		print('Computing phi')
+		phi = get_phi(args.root, chunksize=args.chunksize)
+		print('Producing tables')
+		top, relevance = table_words(args.root, cfg, phi=phi, n=args.n, top=True, relevance=True)
+		learnt = learnt_words(args.root, cfg, phi, n=args.n)
+		top.to_csv(f'{out_dir}/top_words.csv', index=False)
+		relevance.to_csv(f'{out_dir}/relevance_words.csv', index=False)
+		learnt.to_csv(f'{out_dir}/learnt_words.csv', index=False)
 
 	# Co-occurence matrix
 	# Topic correlation heatmap
@@ -60,5 +61,6 @@ if __name__ == "__main__":
     parser.add_argument("--root", "-f", type=str)
     parser.add_argument("--chunksize", "-c", type=int, default=1000)
     parser.add_argument("--n", type=int, default=20)
+    parser.add_argument('--tables', action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
     main(args)
