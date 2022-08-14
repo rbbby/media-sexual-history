@@ -23,16 +23,16 @@ def main(args):
 
 	# Create output folder
 	out_dir = os.path.join(args.root, 'result')
-	os.makedirs(out_dir, exist_ok=True)
+	#os.makedirs(out_dir, exist_ok=True)
 	
 	# Convergence
 	print('Plotting convergence')
 	p = plot_convergence(args.root).draw()
-	p.savefig(f'{out_dir}/convergence.png', dpi=300)
+	#p.savefig(f'{out_dir}/convergence.png', dpi=300)
 
 	# Load matrices
 	print('Computing document term matrix')
-	Nd = compute_document_topic_matrix(args.root, cfg)
+	#Nd = compute_document_topic_matrix(args.root, cfg)
 
 	# Tables
 	if args.tables:
@@ -49,11 +49,11 @@ def main(args):
 	# Topic correlation heatmap
 	print('Creating heatmap')
 	fig = sns.heatmap(np.corrcoef(Nd.T))
-	plt.savefig(f'{out_dir}/topic_correlation_heatmap.png')
+	#plt.savefig(f'{out_dir}/topic_correlation_heatmap.png')
 
 	# Get dates
 	print('Getting dates')
-	_, dates = get_metadata(cfg)
+	_, years = get_metadata(cfg)
 
 
 if __name__ == "__main__":
